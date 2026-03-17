@@ -1,0 +1,9 @@
+# Pinned to specific commits/tags for build stability
+# system-certifi: commit from 2024 (no tags available)
+git+https://github.com/ansible/system-certifi.git@5aa52ab91f9d579bfe52b5acf30ca799f1a563d9#egg=certifi
+# ansible-runner: latest stable release
+git+https://github.com/ansible/ansible-runner.git@2.4.2#egg=ansible-runner
+# python3-saml: commit from 2024 (no tags available, Ansible fork of OneLogin's python3-saml)
+git+https://github.com/ansible/python3-saml.git@f90824c4910e36c5a89dd295271be26691204ba3#egg=python3-saml
+# django-ansible-base: stable tag
+django-ansible-base @ git+https://github.com/ansible/django-ansible-base@2024.9.4#egg=django-ansible-base[rest_filters,jwt_consumer,resource_registry,rbac]

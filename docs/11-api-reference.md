@@ -1,0 +1,251 @@
+# 11 — API Reference
+
+Forge REST API reference. All endpoints are under `/api/v2/`.
+
+---
+
+## Authentication
+
+### Session (browser)
+
+```bash
+curl -c cookies.txt -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"username": "admin", "password": "password"}' \
+  https://forge.example.com/api/login/
+
+curl -b cookies.txt https://forge.example.com/api/v2/me/
+```
+
+### Token (API clients)
+
+```bash
+# Create a token
+curl -u admin:password -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"scope": "write"}' \
+  https://forge.example.com/api/v2/tokens/
+
+# Use the token
+curl -H 'Authorization: Bearer <token>' \
+  https://forge.example.com/api/v2/job_templates/
+```
+
+### Basic Auth
+
+```bash
+curl -u admin:password https://forge.example.com/api/v2/job_templates/
+```
+
+---
+
+## Pagination and Filtering
+
+### Pagination
+
+```bash
+GET /api/v2/jobs/?page=2&page_size=50
+# count, next, previous, results
+```
+
+### Search
+
+```bash
+GET /api/v2/job_templates/?search=deploy          # Full-text
+GET /api/v2/job_templates/?name=Deploy%20App       # Exact match
+GET /api/v2/hosts/?name__contains=web              # Contains
+GET /api/v2/hosts/?name__startswith=prod-          # Starts with
+```
+
+### Ordering
+
+```bash
+GET /api/v2/jobs/?order_by=-created                # Newest first
+GET /api/v2/job_templates/?order_by=name           # Alphabetical
+```
+
+### Date filter
+
+```bash
+GET /api/v2/jobs/?created__gte=2026-03-01&created__lte=2026-03-31
+GET /api/v2/jobs/?finished__isnull=true            # Still running
+```
+
+### By relationship
+
+```bash
+GET /api/v2/jobs/?job_template=5                   # Jobs from template 5
+GET /api/v2/hosts/?inventory=10                    # Hosts in inventory 10
+GET /api/v2/job_templates/?organization=1          # Templates in org 1
+```
+
+---
+
+## Endpoints
+
+### Job Templates
+
+```bash
+GET    /api/v2/job_templates/                      # List
+POST   /api/v2/job_templates/                      # Create
+GET    /api/v2/job_templates/{id}/                  # Detail
+PATCH  /api/v2/job_templates/{id}/                  # Update
+DELETE /api/v2/job_templates/{id}/                  # Delete
+POST   /api/v2/job_templates/{id}/launch/           # Launch (creates a Job)
+GET    /api/v2/job_templates/{id}/launch/           # What's needed to launch
+POST   /api/v2/job_templates/{id}/copy/             # Copy
+GET    /api/v2/job_templates/{id}/jobs/             # Execution history
+GET    /api/v2/job_templates/{id}/survey_spec/      # Survey definition
+POST   /api/v2/job_templates/{id}/survey_spec/      # Set survey
+GET    /api/v2/job_templates/{id}/credentials/      # Credentials on the template
+GET    /api/v2/job_templates/{id}/schedules/        # Schedules
+```
+
+### Jobs
+
+```bash
+GET    /api/v2/jobs/                               # List all jobs
+GET    /api/v2/jobs/{id}/                           # Job detail
+GET    /api/v2/jobs/{id}/stdout/                    # Job output (format=txt|json)
+GET    /api/v2/jobs/{id}/job_events/                # All job events
+GET    /api/v2/jobs/{id}/job_host_summaries/        # Host results
+POST   /api/v2/jobs/{id}/cancel/                    # Cancel a running job
+POST   /api/v2/jobs/{id}/relaunch/                  # Relaunch
+```
+
+### Unified Jobs (all types)
+
+```bash
+GET    /api/v2/unified_jobs/                       # ALL: jobs, project updates, inventory syncs...
+GET    /api/v2/unified_jobs/?type=job              # Only playbook jobs
+GET    /api/v2/unified_jobs/?type=project_update   # Only project syncs
+```
+
+### Projects
+
+```bash
+GET    /api/v2/projects/                           # List
+POST   /api/v2/projects/                           # Create
+PATCH  /api/v2/projects/{id}/                       # Update
+POST   /api/v2/projects/{id}/update/                # Trigger SCM sync
+GET    /api/v2/projects/{id}/playbooks/             # List playbooks in the project
+```
+
+### Inventories, Hosts, Groups
+
+```bash
+GET    /api/v2/inventories/                        # List inventories
+POST   /api/v2/inventories/                        # Create
+GET    /api/v2/inventories/{id}/hosts/             # Hosts in inventory
+POST   /api/v2/inventories/{id}/hosts/             # Add host
+GET    /api/v2/inventories/{id}/groups/            # Groups in inventory
+POST   /api/v2/inventories/{id}/groups/            # Add group
+GET    /api/v2/inventories/{id}/inventory_sources/ # Cloud sync sources
+
+GET    /api/v2/hosts/                              # All hosts (global)
+PATCH  /api/v2/hosts/{id}/                          # Update host
+GET    /api/v2/hosts/{id}/ansible_facts/           # Host facts
+
+POST   /api/v2/groups/{id}/hosts/                  # Add host to group {id: host_id}
+POST   /api/v2/groups/{id}/children/               # Add child group {id: group_id}
+```
+
+### Inventory Sources (Cloud Sync)
+
+```bash
+POST   /api/v2/inventories/{id}/inventory_sources/
+# source: ec2, gce, azure_rm, vmware, openstack, satellite6, scm, custom
+POST   /api/v2/inventory_sources/{id}/update/      # Trigger sync
+```
+
+### Credentials
+
+```bash
+GET    /api/v2/credential_types/                   # Available types
+GET    /api/v2/credentials/                        # List credentials
+POST   /api/v2/credentials/                        # Create credential
+PATCH  /api/v2/credentials/{id}/                    # Update
+```
+
+### Workflows
+
+```bash
+POST   /api/v2/workflow_job_templates/             # Create workflow
+POST   /api/v2/workflow_job_templates/{id}/workflow_nodes/  # Add node
+POST   /api/v2/workflow_job_template_nodes/{id}/success_nodes/  # Connect success
+POST   /api/v2/workflow_job_template_nodes/{id}/failure_nodes/  # Connect failure
+POST   /api/v2/workflow_job_template_nodes/{id}/always_nodes/   # Connect always
+POST   /api/v2/workflow_job_templates/{id}/launch/  # Launch workflow
+GET    /api/v2/workflow_jobs/{id}/workflow_nodes/   # Status of each step
+```
+
+### Users, Teams, Organizations
+
+```bash
+GET    /api/v2/users/                              # List users
+POST   /api/v2/users/                              # Create user
+GET    /api/v2/teams/                              # List teams
+POST   /api/v2/teams/{id}/users/                   # Add user to team {id: user_id}
+POST   /api/v2/roles/{id}/users/                   # Assign role to user {id: user_id}
+POST   /api/v2/roles/{id}/teams/                   # Assign role to team {id: team_id}
+```
+
+### Schedules
+
+```bash
+GET    /api/v2/schedules/                          # List schedules
+POST   /api/v2/schedules/                          # Create schedule
+# rrule format: "DTSTART:20260315T020000Z RRULE:FREQ=DAILY;INTERVAL=1"
+POST   /api/v2/schedules/preview/                  # Preview upcoming runs
+```
+
+### Notifications
+
+```bash
+GET    /api/v2/notification_templates/             # List
+POST   /api/v2/notification_templates/             # Create
+# notification_type: email, slack, webhook, pagerduty, grafana, mattermost, twilio...
+POST   /api/v2/notification_templates/{id}/test/   # Send test notification
+```
+
+### System
+
+```bash
+GET    /api/v2/ping/                               # Health check (no auth)
+GET    /api/v2/config/                             # Version, license, info
+GET    /api/v2/me/                                 # Current user
+GET    /api/v2/activity_stream/                    # Audit log
+GET    /api/v2/instances/                          # Cluster nodes
+GET    /api/v2/instance_groups/                    # Instance groups
+GET    /api/v2/settings/                           # List setting categories
+GET    /api/v2/settings/jobs/                      # Job settings
+PATCH  /api/v2/settings/jobs/                      # Change job settings
+```
+
+### Ad-Hoc Commands
+
+```bash
+# Run a one-off command
+POST /api/v2/ad_hoc_commands/
+# module_name: ping, shell, command, copy, yum, apt...
+# module_args: arguments for the module (e.g., "uptime" for shell)
+```
+
+---
+
+## Watch Out
+
+1. **The `related` field in every response** contains URLs to all related resources.
+   Use this for navigation — don't construct URLs manually.
+
+2. **`summary_fields`** provides inline data about relationships (organization name, project name...).
+   This eliminates the need for additional API calls.
+
+3. **POST for M2M relationships** uses the format `{"id": <target_id>}` for attach,
+   and `{"id": <target_id>, "disassociate": true}` for detach.
+
+4. **The launch endpoint** (GET) returns information about what's needed to launch —
+   which parameters can be overridden and which are required.
+
+5. **All list endpoints are paginated.** Default is 25, max 200.
+   Use the `page_size` parameter to control this.

@@ -1,0 +1,206 @@
+# 02 — Backend (Django)
+
+Overview of backend modules — what each part does, where to find things, and what to watch out for.
+
+---
+
+## Django Applications
+
+| App | Path | Responsibility |
+|-----|------|----------------|
+| `forge.main` | `forge/main/` | Core: models, tasks, signals, migrations, commands |
+| `forge.api` | `forge/api/` | REST API: views, serializers, URL routing |
+| `forge.conf` | `forge/conf/` | Database-backed settings system |
+| `forge.sso` | `forge/sso/` | SSO authentication (LDAP, SAML, social) |
+| `forge.ui_next` | `forge/ui_next/` | React frontend (served through Django) |
+
+---
+
+## Models — Where things live
+
+All models are in `forge/main/models/`. Each file covers one domain area:
+
+| File | Contents | Note |
+|------|----------|------|
+| `base.py` | Base classes for all models | `PrimordialModel` adds `created_by`, `modified_by` — every model has these |
+| `organization.py` | Organization, Team, Profile | Organization is the top-level container — **everything** belongs to one |
+| `unified_jobs.py` | UnifiedJobTemplate, UnifiedJob | Abstract base for ALL job types — key to understanding the system |
+| `jobs.py` | JobTemplate, Job, JobHostSummary | Template defines "what to run", Job is "one execution of it" |
+| `inventory.py` | Inventory, Host, Group, InventorySource | Host/Group hierarchy, cloud sync sources |
+| `projects.py` | Project, ProjectUpdate | Git repository with playbooks |
+| `credentials/` | Credential, CredentialType | Encrypted secrets — **never** plaintext in the database |
+| `workflow.py` | WorkflowJobTemplate, nodes | DAG orchestration — success/failure/always branches |
+| `ha.py` | Instance, InstanceGroup | Cluster nodes and capacity |
+| `events.py` | JobEvent (and variants) | Output for every job — **partitioned table** |
+| `notifications.py` | NotificationTemplate | Email, Slack, webhook, PagerDuty... |
+| `schedules.py` | Schedule | iCal recurrence rules for automatic execution |
+| `activity_stream.py` | ActivityStream | Audit log of all changes |
+| `rbac.py` | Role | RBAC system — roles and permissions |
+| `oauth.py` | OAuth2Application, Token | API tokens |
+| `execution_environments.py` | ExecutionEnvironment | Container image reference for execution |
+
+### Watch out
+
+- **UnifiedJob pattern:** Every executable (JobTemplate, Project, InventorySource) follows
+  the same pattern — a template creates an instance. If you understand `UnifiedJobTemplate → UnifiedJob`,
+  you understand all job types.
+
+- **Credential encryption:** Fields marked as `secret` in `CredentialType.inputs` are
+  encrypted before saving. Never read credentials directly from the database — use the API.
+
+- **Computed fields on Inventory:** `total_hosts`, `hosts_with_active_failures`, etc.
+  are updated via signals. If you add a host directly to the database (not through the API),
+  these fields won't update until `update_computed_fields()` is called.
+
+- **Organization is required:** Almost every resource requires an `organization` FK. Without
+  an organization, RBAC won't work because roles are inherited from the organization.
+
+---
+
+## REST API — Structure
+
+The API is in `forge/api/` and follows DRF (Django REST Framework) conventions.
+
+### File locations
+
+| What you're looking for | Where to find it |
+|--------------------------|-----------------|
+| API endpoints (URL routing) | `forge/api/urls/` — one file per resource |
+| View logic (what the endpoint does) | `forge/api/views/` — one file per resource |
+| Serialization (JSON ↔ Model) | `forge/api/serializers/` — data transformation |
+| Permissions | `forge/api/permissions.py` — access checks |
+| Authentication | `forge/api/authentication.py` — session, token, basic |
+| Pagination | `forge/api/pagination.py` — default 25 per page |
+| Filtering | `forge/api/filters.py` — search, ordering, field filters |
+
+### API conventions
+
+- **List:** `GET /api/v2/{resource}/` → paginated JSON with `count`, `next`, `previous`, `results`
+- **Detail:** `GET /api/v2/{resource}/{id}/` → single object
+- **Create:** `POST /api/v2/{resource}/` → body with data
+- **Update:** `PATCH /api/v2/{resource}/{id}/` → partial update
+- **Delete:** `DELETE /api/v2/{resource}/{id}/` → 204 No Content
+- **Actions:** `POST /api/v2/{resource}/{id}/{action}/` → launch, cancel, update...
+- **Nested:** `GET /api/v2/{parent}/{id}/{child}/` → related resources
+
+### Watch out
+
+- **`related` field:** Every API response has a `related` dict with URLs to related
+  resources. Use this instead of manually constructing URLs.
+
+- **`summary_fields`:** Inline data about related objects (organization name, project name...).
+  This eliminates the need for additional API calls.
+
+- **OPTIONS request:** Every endpoint returns metadata about available fields and actions
+  via OPTIONS. Useful for dynamically generating forms.
+
+- **RBAC filtering:** List endpoints automatically filter results based on user permissions.
+  An admin sees everything; a regular user sees only what they have access to.
+
+---
+
+## Signals — Automatic side-effect actions
+
+Signals are in `forge/main/signals.py` and automatically react to database changes:
+
+| Signal | What it does |
+|--------|-------------|
+| Post-save on any model | Creates a record in the Activity Stream |
+| Host create/delete | Updates computed fields on the Inventory |
+| User change (superuser) | Synchronizes the system_administrator role |
+| Group deletion | Moves child groups and hosts to the parent |
+| Workflow changes | Updates approval template lifecycle |
+
+**Watch out:** Signals execute synchronously — if a signal throws an exception,
+the entire transaction is rolled back. If you see unexpected IntegrityError,
+check if a signal is attempting something invalid.
+
+---
+
+## Management Commands
+
+Commands are in `forge/main/management/commands/`. They are run with `forge-manage`
+(or `awx-manage` — both work, backward compatibility).
+
+### Most important commands
+
+**Instance management:**
+- `forge-manage provision_instance --hostname=node1` — register a new cluster node
+- `forge-manage deprovision_instance --hostname=node1` — remove a node
+- `forge-manage list_instances` — show all nodes with capacity
+
+**Users:**
+- `forge-manage createsuperuser` — create admin user
+- `forge-manage update_password --username=admin --password=new` — reset password
+
+**Database:**
+- `forge-manage migrate` — apply migrations
+- `forge-manage check_db` — verify database connectivity
+- `forge-manage dbshell` — open PostgreSQL shell
+
+**Cleanup (run periodically):**
+- `forge-manage cleanup_jobs --days=90` — delete old jobs and events
+- `forge-manage cleanup_sessions` — delete expired sessions
+- `forge-manage cleanup_tokens` — delete expired OAuth tokens
+
+**Diagnostics:**
+- `forge-manage check_instance_ready` — is the node ready for work
+- `forge-manage stats` — system statistics
+
+### Watch out
+
+- `cleanup_jobs` is **critical** for production. Without it, the job event table grows
+  without limit. Recommendation: set up as a System Job that runs daily.
+
+- `provision_instance` is automatically called in the init script during deployment.
+  You only run it manually when adding new nodes to the cluster.
+
+---
+
+## Configuration System — Two levels
+
+### Level 1: File-based (Django settings)
+
+Loaded at startup, cannot be changed without restart.
+
+| File | Contents |
+|------|----------|
+| `forge/settings/defaults/base.py` | Core: DATABASES, INSTALLED_APPS, REST_FRAMEWORK |
+| `forge/settings/defaults/auth.py` | Authentication backends |
+| `forge/settings/defaults/jobs.py` | Job execution defaults |
+| `forge/settings/defaults/celery_conf.py` | Celery/Redis configuration |
+| `forge/settings/defaults/logging_conf.py` | Logging |
+| `forge/settings/production.py` | Production overrides (DEBUG=False) |
+| `/etc/tower/conf.d/*.py` | Per-module settings inside the container |
+
+### Level 2: Database-backed (Forge conf system)
+
+Stored in PostgreSQL, changed via API (`/api/v2/settings/`) **without restart**.
+
+Registered in `forge/conf/` and covering: job timeouts, LDAP configuration,
+logging, notifications, and much more.
+
+**Watch out:** Database settings **override** file settings. If something isn't
+working as expected, check if it's been overridden in the database:
+
+```bash
+forge-manage print_setting SETTING_NAME
+```
+
+---
+
+## Migrations
+
+Forge has **252 Django migrations** in `forge/main/migrations/`.
+
+### Watch out
+
+- All migrations reference `forge.main.fields` — not `awx.main.fields`. If you
+  create a new migration, `makemigrations` will automatically use the correct prefix.
+
+- **Never edit existing migrations** — only add new ones.
+
+- If a migration fails, check `forge-manage showmigrations | grep "\[ \]"`
+  to see which ones are unapplied.
+
+- The init script automatically runs `migrate` during deployment.
