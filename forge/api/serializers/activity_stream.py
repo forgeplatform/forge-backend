@@ -75,6 +75,9 @@ class ActivityStreamSerializer(BaseSerializer):
             'object_association',
             'action_node',
             'object_type',
+            'actor_ip',
+            'actor_user_agent',
+            'actor_session_id',
         )
 
     def get_fields(self):

@@ -38,6 +38,49 @@ logger = logging.getLogger('forge.main.middleware')
 perf_logger = logging.getLogger('forge.analytics.performance')
 
 
+# Thread-local storage for request context (IP, user agent, session)
+# Used by ActivityStream signals to capture audit metadata.
+_request_context = threading.local()
+
+
+def get_request_context():
+    """Return dict with actor_ip, actor_user_agent, actor_session_id from current request."""
+    return {
+        'actor_ip': getattr(_request_context, 'ip', ''),
+        'actor_user_agent': getattr(_request_context, 'user_agent', ''),
+        'actor_session_id': getattr(_request_context, 'session_id', ''),
+    }
+
+
+class RequestContextMiddleware(MiddlewareMixin):
+    """
+    Captures request metadata (IP, User-Agent, session ID) into thread-local
+    storage so that ActivityStream signals can include it in audit entries.
+    Must be placed after AuthenticationMiddleware.
+    """
+
+    def process_request(self, request):
+        # IP address
+        forwarded = request.META.get('HTTP_X_FORWARDED_FOR', '')
+        if forwarded:
+            _request_context.ip = forwarded.split(',')[0].strip()
+        else:
+            _request_context.ip = request.META.get('REMOTE_ADDR', '')
+
+        # User agent
+        _request_context.user_agent = request.META.get('HTTP_USER_AGENT', '')[:512]
+
+        # Session ID
+        session_key = getattr(getattr(request, 'session', None), 'session_key', None)
+        _request_context.session_id = session_key or ''
+
+    def process_response(self, request, response):
+        _request_context.ip = ''
+        _request_context.user_agent = ''
+        _request_context.session_id = ''
+        return response
+
+
 class SettingsCacheMiddleware(MiddlewareMixin):
     """
     Clears the in-memory settings cache at the beginning of a request.

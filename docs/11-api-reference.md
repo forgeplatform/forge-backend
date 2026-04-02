@@ -216,7 +216,11 @@ POST   /api/v2/notification_templates/{id}/test/   # Send test notification
 GET    /api/v2/ping/                               # Health check (no auth)
 GET    /api/v2/config/                             # Version, license, info
 GET    /api/v2/me/                                 # Current user
-GET    /api/v2/activity_stream/                    # Audit log
+GET    /api/v2/activity_stream/                    # Activity stream (change log)
+GET    /api/v2/audit_events/                       # Audit events (immutable security log)
+GET    /api/v2/audit_events/?format=csv            # Export audit events as CSV
+GET    /api/v2/audit_events/?format=siem           # Export audit events for SIEM (flat JSON)
+GET    /api/v2/audit_events/{id}/                  # Audit event detail
 GET    /api/v2/instances/                          # Cluster nodes
 GET    /api/v2/instance_groups/                    # Instance groups
 GET    /api/v2/settings/                           # List setting categories

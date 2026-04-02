@@ -474,6 +474,13 @@ def activity_stream_create(sender, instance, created, **kwargs):
             changes['labels'] = [label.name for label in instance.labels.iterator()]
             if 'extra_vars' in changes:
                 changes['extra_vars'] = instance.display_extra_vars()
+            # Audit: log credential access for each credential used by this job
+            try:
+                from forge.main.utils.audit import log_credential_access
+                for cred in instance.credentials.iterator():
+                    log_credential_access(cred, job=instance, actor=get_current_user_or_none())
+            except Exception:
+                logger.exception('Failed to log credential access audit events for job %s', instance.pk)
         if type(instance) == OAuth2AccessToken:
             changes['token'] = CENSOR_VALUE
         activity_entry = get_activity_stream_class()(operation='create', object1=object1, changes=json.dumps(changes), actor=get_current_user_or_none())

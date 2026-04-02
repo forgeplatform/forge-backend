@@ -78,6 +78,7 @@ from .workflow_job_template_node import urls as workflow_job_template_node_urls
 from .workflow_job_node import urls as workflow_job_node_urls
 from .schedule import urls as schedule_urls
 from .activity_stream import urls as activity_stream_urls
+from .audit import urls as audit_urls
 from .instance import urls as instance_urls
 from .instance_group import urls as instance_group_urls
 from .oauth2 import urls as oauth2_urls
@@ -149,6 +150,7 @@ v2_urls = [
     re_path(r'^unified_job_templates/$', UnifiedJobTemplateList.as_view(), name='unified_job_template_list'),
     re_path(r'^unified_jobs/$', UnifiedJobList.as_view(), name='unified_job_list'),
     re_path(r'^activity_stream/', include(activity_stream_urls)),
+    re_path(r'^audit_events/', include(audit_urls)),
     re_path(rf'^{AWX_ANALYTICS_API_PREFIX}/', include(analytics_urls)),
     re_path(r'^workflow_approval_templates/', include(workflow_approval_template_urls)),
     re_path(r'^workflow_approvals/', include(workflow_approval_urls)),

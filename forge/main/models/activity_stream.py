@@ -44,6 +44,24 @@ class ActivityStream(models.Model):
         help_text=_("The cluster node the activity took place on."),
     )
 
+    actor_ip = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        help_text=_("IP address of the actor who triggered this event."),
+    )
+    actor_user_agent = models.CharField(
+        max_length=512,
+        blank=True,
+        default='',
+        help_text=_("User-Agent header from the actor's request."),
+    )
+    actor_session_id = models.CharField(
+        max_length=64,
+        blank=True,
+        default='',
+        help_text=_("Session ID of the actor at the time of the event."),
+    )
+
     object_relationship_type = models.TextField(blank=True)
     object1 = models.TextField()
     object2 = models.TextField()
@@ -115,5 +133,16 @@ class ActivityStream(models.Model):
 
         hostname_char_limit = self._meta.get_field('action_node').max_length
         self.action_node = settings.CLUSTER_HOST_ID[:hostname_char_limit]
+
+        # Populate request context fields (IP, user agent, session) on first save
+        if not self.pk:
+            from forge.main.middleware import get_request_context
+            ctx = get_request_context()
+            if not self.actor_ip and ctx['actor_ip']:
+                self.actor_ip = ctx['actor_ip']
+            if not self.actor_user_agent and ctx['actor_user_agent']:
+                self.actor_user_agent = ctx['actor_user_agent']
+            if not self.actor_session_id and ctx['actor_session_id']:
+                self.actor_session_id = ctx['actor_session_id']
 
         super(ActivityStream, self).save(*args, **kwargs)

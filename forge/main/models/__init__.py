@@ -58,6 +58,7 @@ from forge.main.models.ad_hoc_commands import AdHocCommand  # noqa
 from forge.main.models.schedules import Schedule  # noqa
 from forge.main.models.execution_environments import ExecutionEnvironment  # noqa
 from forge.main.models.activity_stream import ActivityStream  # noqa
+from forge.main.models.audit import AuditEvent  # noqa
 from forge.main.models.ha import (  # noqa
     Instance,
     InstanceLink,
