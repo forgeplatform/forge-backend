@@ -12,6 +12,7 @@ from forge.api.views import (
     JobTemplateCallback,
     JobTemplateSchedulesList,
     JobTemplateSurveySpec,
+    JobTemplateSurveyDynamicChoices,
     JobTemplateActivityStreamList,
     JobTemplateNotificationTemplatesErrorList,
     JobTemplateNotificationTemplatesStartedList,
@@ -33,6 +34,7 @@ urls = [
     re_path(r'^(?P<pk>[0-9]+)/callback/$', JobTemplateCallback.as_view(), name='job_template_callback'),
     re_path(r'^(?P<pk>[0-9]+)/schedules/$', JobTemplateSchedulesList.as_view(), name='job_template_schedules_list'),
     re_path(r'^(?P<pk>[0-9]+)/survey_spec/$', JobTemplateSurveySpec.as_view(), name='job_template_survey_spec'),
+    re_path(r'^(?P<pk>[0-9]+)/survey_spec/dynamic_choices/$', JobTemplateSurveyDynamicChoices.as_view(), name='job_template_survey_dynamic_choices'),
     re_path(r'^(?P<pk>[0-9]+)/activity_stream/$', JobTemplateActivityStreamList.as_view(), name='job_template_activity_stream_list'),
     re_path(
         r'^(?P<pk>[0-9]+)/notification_templates_started/$',

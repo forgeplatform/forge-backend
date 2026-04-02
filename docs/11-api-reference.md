@@ -97,6 +97,8 @@ POST   /api/v2/job_templates/{id}/copy/             # Copy
 GET    /api/v2/job_templates/{id}/jobs/             # Execution history
 GET    /api/v2/job_templates/{id}/survey_spec/      # Survey definition
 POST   /api/v2/job_templates/{id}/survey_spec/      # Set survey
+DELETE /api/v2/job_templates/{id}/survey_spec/      # Delete survey
+POST   /api/v2/job_templates/{id}/survey_spec/dynamic_choices/  # Resolve dynamic choices
 GET    /api/v2/job_templates/{id}/credentials/      # Credentials on the template
 GET    /api/v2/job_templates/{id}/schedules/        # Schedules
 ```

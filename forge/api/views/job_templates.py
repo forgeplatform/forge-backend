@@ -213,6 +213,7 @@ class JobTemplateSurveySpec(GenericAPIView):
     def _validate_spec_data(new_spec, old_spec):
         from forge.main.constants import SURVEY_TYPE_MAPPING
         from forge.main.utils.encryption import encrypt_value
+        from forge.main.services.dynamic_survey import validate_dynamic_choices_config
 
         schema_errors = {}
         for field, expect_type, type_label in [('name', str, 'string'), ('description', str, 'string'), ('spec', list, 'list of items')]:
@@ -328,6 +329,23 @@ class JobTemplateSurveySpec(GenericAPIView):
                             dict(error=_("Default choice must be answered from the choices listed.".format(**context))), status=status.HTTP_400_BAD_REQUEST
                         )
 
+            # Validate dynamic_choices configuration if present
+            if 'dynamic_choices' in survey_item:
+                dc_errors = validate_dynamic_choices_config(survey_item['dynamic_choices'])
+                if dc_errors:
+                    return Response(
+                        dict(error=_("dynamic_choices error in survey question {idx}: {errors}").format(
+                            errors='; '.join(dc_errors), **context
+                        )),
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                # Dynamic choices questions must be multiplechoice or multiselect
+                if survey_item['dynamic_choices'].get('enabled') and qtype not in ('multiplechoice', 'multiselect'):
+                    return Response(
+                        dict(error=_("dynamic_choices in survey question {idx} is only supported for multiplechoice and multiselect types.").format(**context)),
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
             # Process encryption substitution
             if "default" in survey_item and isinstance(survey_item['default'], str) and survey_item['default'].startswith('$encrypted$'):
                 # Submission expects the existence of encrypted DB value to replace given default
@@ -366,6 +384,48 @@ class JobTemplateSurveySpec(GenericAPIView):
         obj.survey_spec = {}
         obj.save()
         return Response()
+
+
+class JobTemplateSurveyDynamicChoices(GenericAPIView):
+    model = models.JobTemplate
+    obj_permission_type = 'start'
+    serializer_class = serializers.EmptySerializer
+
+    def post(self, request, *args, **kwargs):
+        from forge.main.services.dynamic_survey import resolve_dynamic_choices
+
+        obj = self.get_object()
+
+        if not obj.survey_enabled or not obj.survey_spec:
+            return Response(
+                {'error': _('Survey is not enabled for this template.')},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        requested_variables = request.data.get('variables', [])
+        if not isinstance(requested_variables, list):
+            return Response(
+                {'error': _("'variables' must be a list of survey variable names.")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        results = {}
+        for question in obj.survey_spec.get('spec', []):
+            variable = question.get('variable', '')
+            dc = question.get('dynamic_choices', {})
+
+            # If specific variables requested, only resolve those
+            if requested_variables and variable not in requested_variables:
+                continue
+
+            if dc and dc.get('enabled'):
+                choices = resolve_dynamic_choices(question, template=obj)
+                results[variable] = {
+                    'choices': choices or [],
+                    'source_type': dc.get('source_type', ''),
+                }
+
+        return Response(results)
 
 
 class JobTemplateActivityStreamList(SubListAPIView):

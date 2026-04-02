@@ -279,19 +279,28 @@ class SurveyJobTemplateMixin(models.Model):
                 if type(data[survey_element['variable']]) != list:
                     errors.append("'%s' value is expected to be a list." % survey_element['variable'])
                 else:
-                    choice_list = copy(survey_element['choices'])
-                    if isinstance(choice_list, str):
-                        choice_list = [choice for choice in choice_list.splitlines() if choice.strip() != '']
-                    for val in data[survey_element['variable']]:
-                        if val not in choice_list:
-                            errors.append("Value %s for '%s' expected to be one of %s." % (val, survey_element['variable'], choice_list))
+                    # Skip static choice validation for dynamic choices questions
+                    dc = survey_element.get('dynamic_choices', {})
+                    if dc and dc.get('enabled'):
+                        pass  # Dynamic choices are validated at resolve time
+                    else:
+                        choice_list = copy(survey_element['choices'])
+                        if isinstance(choice_list, str):
+                            choice_list = [choice for choice in choice_list.splitlines() if choice.strip() != '']
+                        for val in data[survey_element['variable']]:
+                            if val not in choice_list:
+                                errors.append("Value %s for '%s' expected to be one of %s." % (val, survey_element['variable'], choice_list))
         elif survey_element['type'] == 'multiplechoice':
-            choice_list = copy(survey_element['choices'])
-            if isinstance(choice_list, str):
-                choice_list = [choice for choice in choice_list.splitlines() if choice.strip() != '']
-            if survey_element['variable'] in data:
-                if data[survey_element['variable']] not in choice_list:
-                    errors.append("Value %s for '%s' expected to be one of %s." % (data[survey_element['variable']], survey_element['variable'], choice_list))
+            dc = survey_element.get('dynamic_choices', {})
+            if dc and dc.get('enabled'):
+                pass  # Dynamic choices are validated at resolve time
+            else:
+                choice_list = copy(survey_element['choices'])
+                if isinstance(choice_list, str):
+                    choice_list = [choice for choice in choice_list.splitlines() if choice.strip() != '']
+                if survey_element['variable'] in data:
+                    if data[survey_element['variable']] not in choice_list:
+                        errors.append("Value %s for '%s' expected to be one of %s." % (data[survey_element['variable']], survey_element['variable'], choice_list))
         return errors
 
     def _accept_or_ignore_variables(self, data, errors=None, _exclude_errors=(), extra_passwords=None):
