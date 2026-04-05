@@ -1111,6 +1111,9 @@ class RunJob(SourceControlMixin, BaseTask):
                 job_id=job.id,
                 inventory_id=job.inventory_id,
             )
+            # Capture fact snapshots for drift detection
+            from forge.main.tasks.drift import capture_fact_snapshot
+            capture_fact_snapshot.delay(job.id)
 
     def final_run_hook(self, job, status, private_data_dir):
         super(RunJob, self).final_run_hook(job, status, private_data_dir)

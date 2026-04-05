@@ -23,6 +23,9 @@ Schedule ──► UnifiedJobTemplate (any template type)
 Organization ──1:N──► EventRule ──1:N──► EventLog
              ──1:N──► OutboundWebhook
 
+Host ──1:N──► HostFactSnapshot ──1:N──► DriftDetection
+Organization ──1:N──► DriftAlertRule ──1:N──► DriftAlert
+
 Role ──M:N──► User
      ──M:N──► Team
      ──parent/child──► Role (hierarchy)
@@ -54,6 +57,15 @@ Role ──M:N──► User
 | `main_eventlog` | Incoming webhook events and evaluation results | **Fast** (depends on webhook traffic) |
 | `main_outboundwebhook` | Outbound webhook configurations | Slow |
 
+### Drift Detection
+
+| Table | Description | Growth rate |
+|-------|-------------|-------------|
+| `main_hostfactsnapshot` | Point-in-time host fact captures | **Fast** (one per host per changed job run) |
+| `main_driftdetection` | Detected configuration changes | **Fast** (depends on change frequency) |
+| `main_driftalertrule` | Alert rules for drift thresholds | Slow (admin-created) |
+| `main_driftalert` | Triggered alert records | Medium |
+
 ### Execution (GROW FAST — cleanup required)
 
 | Table | Description | Growth rate |
@@ -66,6 +78,8 @@ Role ──M:N──► User
 | `main_auditevent` | Immutable security audit log | **Fast** |
 | `main_eventlog` | EDA webhook event logs | **Fast** (depends on webhook volume) |
 | `main_notification` | Sent notifications | Medium |
+| `main_hostfactsnapshot` | Host fact snapshots for drift detection | **Fast** (cleanup via `cleanup_old_snapshots`) |
+| `main_driftdetection` | Detected configuration drift items | **Fast** |
 
 ### Watch out
 

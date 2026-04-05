@@ -268,6 +268,51 @@ curl -X POST https://forge.example.com/api/v2/event_rules/ \
   }'
 ```
 
+### Drift Detection
+
+```bash
+GET    /api/v2/fact_snapshots/                          # List snapshots (filter: host, inventory, job)
+GET    /api/v2/fact_snapshots/{id}/                     # Snapshot detail (includes full facts)
+
+GET    /api/v2/drift_detections/                        # List drift items (filter: host, category, severity, acknowledged)
+GET    /api/v2/drift_detections/{id}/                   # Drift detail (before/after diff)
+POST   /api/v2/drift_detections/{id}/acknowledge/       # Mark acknowledged
+POST   /api/v2/drift_detections/compare/                # Compare two snapshots
+GET    /api/v2/drift_detections/export/                 # CSV compliance report
+GET    /api/v2/drift_detections/summary/                # Dashboard stats
+
+GET    /api/v2/drift_alert_rules/                       # List alert rules
+POST   /api/v2/drift_alert_rules/                       # Create alert rule
+GET    /api/v2/drift_alert_rules/{id}/                  # Detail
+PATCH  /api/v2/drift_alert_rules/{id}/                  # Update
+DELETE /api/v2/drift_alert_rules/{id}/                  # Delete
+POST   /api/v2/drift_alert_rules/{id}/enable/           # Enable
+POST   /api/v2/drift_alert_rules/{id}/disable/          # Disable
+
+GET    /api/v2/drift_alerts/                            # List triggered alerts
+GET    /api/v2/drift_alerts/{id}/                       # Alert detail
+
+GET    /api/v2/hosts/{id}/drift/                        # Host drift history
+```
+
+### Drift Alert Rule — Create Example
+
+```bash
+curl -X POST https://forge.example.com/api/v2/drift_alert_rules/ \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Critical kernel changes",
+    "organization": 1,
+    "categories": ["kernel", "users_groups"],
+    "severity_min": "high",
+    "threshold_count": 1,
+    "threshold_window_minutes": 60,
+    "cooldown_minutes": 30,
+    "notification_template": 5
+  }'
+```
+
 ### Administration
 
 ```bash

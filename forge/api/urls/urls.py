@@ -88,12 +88,14 @@ from .workflow_approval import urls as workflow_approval_urls
 from .analytics import urls as analytics_urls
 from .receptor_address import urls as receptor_address_urls
 from .eda import event_rule_urls, event_log_urls, outbound_webhook_urls, eda_webhook_urls
+from .drift import fact_snapshot_urls, drift_detection_urls, drift_alert_rule_urls, drift_alert_urls
 
 v2_urls = [
     re_path(r'^$', ApiV2RootView.as_view(), name='api_v2_root_view'),
     re_path(r'^credential_types/', include(credential_type_urls)),
     re_path(r'^credential_input_sources/', include(credential_input_source_urls)),
     re_path(r'^hosts/(?P<pk>[0-9]+)/ansible_facts/$', HostAnsibleFactsDetail.as_view(), name='host_ansible_facts_detail'),
+    re_path(r'^hosts/(?P<pk>[0-9]+)/drift/$', __import__('forge.api.views.drift', fromlist=['HostDriftHistory']).HostDriftHistory.as_view(), name='host_drift_history'),
     re_path(r'^jobs/(?P<pk>[0-9]+)/credentials/$', JobCredentialsList.as_view(), name='job_credentials_list'),
     re_path(r'^job_templates/(?P<pk>[0-9]+)/credentials/$', JobTemplateCredentialsList.as_view(), name='job_template_credentials_list'),
     re_path(r'^schedules/preview/$', SchedulePreview.as_view(), name='schedule_rrule'),
@@ -164,6 +166,10 @@ v2_urls = [
     re_path(r'^event_logs/', include(event_log_urls)),
     re_path(r'^outbound_webhooks/', include(outbound_webhook_urls)),
     re_path(r'^eda_webhooks/', include(eda_webhook_urls)),
+    re_path(r'^fact_snapshots/', include(fact_snapshot_urls)),
+    re_path(r'^drift_detections/', include(drift_detection_urls)),
+    re_path(r'^drift_alert_rules/', include(drift_alert_rule_urls)),
+    re_path(r'^drift_alerts/', include(drift_alert_urls)),
 ]
 
 

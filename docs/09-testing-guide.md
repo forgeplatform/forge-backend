@@ -10,8 +10,8 @@ How to run tests, what to test, and where tests live.
 |-------|------|-------|----------|
 | Python unit | pytest | 1083 | `forge/main/tests/unit/` |
 | Python functional (API) | pytest | 989 | `forge/main/tests/functional/` |
-| Standalone (EDA, audit, etc.) | unittest | 38+ | `tests_standalone/` |
-| Frontend | vitest | 58+ | `forge/ui_next/src/**/*.test.{ts,tsx}` |
+| Standalone (EDA, drift, audit) | unittest | 77+ | `tests_standalone/` |
+| Frontend | vitest | 72+ | `forge/ui_next/src/**/*.test.{ts,tsx}` |
 | Python lint | flake8 | — | `forge/` |
 | Frontend lint | TypeScript | — | `forge/ui_next/src/` |
 
@@ -20,6 +20,9 @@ How to run tests, what to test, and where tests live.
 ```bash
 # Run EDA tests (condition engine, HMAC, throttling, dedup)
 python -m unittest tests_standalone.test_eda -v
+
+# Run drift detection tests (compute_drift, hashing, classification, severity)
+python -m unittest tests_standalone.test_drift -v
 
 # Run all standalone tests
 python -m unittest discover tests_standalone -v
