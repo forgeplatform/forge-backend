@@ -295,6 +295,29 @@ GET    /api/v2/drift_alerts/{id}/                       # Alert detail
 GET    /api/v2/hosts/{id}/drift/                        # Host drift history
 ```
 
+### Self-Service Portal
+
+```bash
+GET    /api/v2/service_catalog_items/                   # List catalog items (filter: category, enabled, search, organization)
+POST   /api/v2/service_catalog_items/                   # Create catalog item (admin)
+GET    /api/v2/service_catalog_items/{id}/              # Detail
+PATCH  /api/v2/service_catalog_items/{id}/              # Update
+DELETE /api/v2/service_catalog_items/{id}/              # Delete
+GET    /api/v2/service_catalog_items/{id}/launch_data/  # Survey spec from underlying JT/WFJT (+ per-node surveys)
+GET    /api/v2/service_catalog_items/{id}/requests/     # All requests for a catalog item
+POST   /api/v2/service_catalog_items/{id}/submit/       # End-user submit (extra_vars, node_survey_data, justification)
+
+GET    /api/v2/service_requests/                        # List service requests (filter: mine, status, catalog_item)
+GET    /api/v2/service_requests/pending_approvals/      # Approval inbox (filtered to caller's authority)
+GET    /api/v2/service_requests/{id}/                   # Detail
+DELETE /api/v2/service_requests/{id}/                   # Delete (only pending/rejected)
+POST   /api/v2/service_requests/{id}/approve/           # Approve & launch
+POST   /api/v2/service_requests/{id}/reject/            # Reject ({reason})
+```
+
+See `docs/17-self-service-portal.md` for the lifecycle, approver
+permission rules, and a deeper architectural overview.
+
 ### Drift Alert Rule — Create Example
 
 ```bash
