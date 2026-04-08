@@ -1667,58 +1667,10 @@ if settings.ALLOW_LOCAL_RESOURCE_MANAGEMENT:
     register_validate('tacacsplus', tacacs_validate)
 
     # ------------------------------------------------------------------
-    # Generic OIDC (OpenID Connect) — relying-party / single provider
+    # OIDC additions on top of the existing Generic OIDC settings
+    # (KEY/SECRET/OIDC_ENDPOINT/VERIFY_SSL are already registered above).
     # ------------------------------------------------------------------
 
-    register(
-        'SOCIAL_AUTH_OIDC_OIDC_ENDPOINT',
-        field_class=fields.CharField,
-        allow_blank=True,
-        default='',
-        label=_('OIDC Provider URL'),
-        help_text=_('Issuer URL of the OIDC provider, e.g. https://keycloak.example.com/realms/forge.'),
-        category=_('OIDC'),
-        category_slug='oidc',
-    )
-    register(
-        'SOCIAL_AUTH_OIDC_KEY',
-        field_class=fields.CharField,
-        allow_blank=True,
-        default='',
-        label=_('OIDC Client ID'),
-        help_text=_('Client ID registered with the OIDC provider.'),
-        category=_('OIDC'),
-        category_slug='oidc',
-    )
-    register(
-        'SOCIAL_AUTH_OIDC_SECRET',
-        field_class=fields.CharField,
-        allow_blank=True,
-        default='',
-        encrypted=True,
-        label=_('OIDC Client Secret'),
-        help_text=_('Client secret issued by the OIDC provider.'),
-        category=_('OIDC'),
-        category_slug='oidc',
-    )
-    register(
-        'SOCIAL_AUTH_OIDC_SCOPE',
-        field_class=fields.ListField,
-        default=['openid', 'profile', 'email'],
-        label=_('OIDC Scopes'),
-        help_text=_('Scopes requested from the OIDC provider.'),
-        category=_('OIDC'),
-        category_slug='oidc',
-    )
-    register(
-        'SOCIAL_AUTH_OIDC_VERIFY_SSL',
-        field_class=fields.BooleanField,
-        default=True,
-        label=_('OIDC Verify SSL'),
-        help_text=_('Whether to verify the OIDC provider TLS certificate.'),
-        category=_('OIDC'),
-        category_slug='oidc',
-    )
     register(
         'SOCIAL_AUTH_OIDC_BUTTON_LABEL',
         field_class=fields.CharField,
