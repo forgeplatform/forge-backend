@@ -66,6 +66,13 @@ Role ──M:N──► User
 | `main_driftalertrule` | Alert rules for drift thresholds | Slow (admin-created) |
 | `main_driftalert` | Triggered alert records | Medium |
 
+### Self-Service Portal
+
+| Table | Description | Growth rate |
+|-------|-------------|-------------|
+| `main_servicecatalogitem` | Curated portal entries wrapping JT/WFJT | Slow (admin-curated) |
+| `main_servicerequest` | End-user requests with lifecycle (pending → approved/rejected → running → terminal) | Medium |
+
 ### Execution (GROW FAST — cleanup required)
 
 | Table | Description | Growth rate |
