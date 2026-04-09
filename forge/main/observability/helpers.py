@@ -117,3 +117,14 @@ def aggregate_health(last_check_iso, ttl_seconds=30, now=None):
 def should_recheck_health(last_check_iso, ttl_seconds=30, now=None):
     """Opposite of :func:`aggregate_health` — True when cache is stale/missing."""
     return not aggregate_health(last_check_iso, ttl_seconds=ttl_seconds, now=now)
+
+
+def parse_env_bool(s):
+    """Parse a string env var into a bool.
+
+    Truthy: ``true``, ``1``, ``yes``, ``on`` (case-insensitive).
+    Everything else (including empty / None) is False.
+    """
+    if s is None:
+        return False
+    return str(s).strip().lower() in ('true', '1', 'yes', 'on')

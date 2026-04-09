@@ -282,6 +282,18 @@ def _tenancy_on_unified_job_save(sender, instance, created, **kwargs):
         on_job_finished(instance)
     except Exception:  # pylint: disable=broad-except
         pass
+    # Tier 3.6 follow-up: emit forge_job_duration_seconds histogram observation
+    # so the Grafana p50/p95/p99 panels actually have data.
+    try:
+        started = getattr(instance, 'started', None)
+        finished = getattr(instance, 'finished', None)
+        if started and finished:
+            duration = (finished - started).total_seconds()
+            template_type = instance.__class__.__name__.lower()
+            from forge.main.observability.metrics import observe_job_duration
+            observe_job_duration(duration, template_type)
+    except Exception:  # pylint: disable=broad-except
+        pass
 
 
 post_save.connect(_tenancy_on_unified_job_save, sender=UnifiedJob)

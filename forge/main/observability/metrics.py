@@ -94,6 +94,22 @@ def inc_policy_evaluations(decision):
         pass
 
 
+def inc_tenant_quota_blocks(kind):
+    c = _get(
+        'forge_tenant_quota_blocks_total',
+        lambda m: m.create_counter(
+            'forge_tenant_quota_blocks_total',
+            description='Number of tenant launches blocked by quota, by kind',
+        ),
+    )
+    if c is None:
+        return
+    try:
+        c.add(1, {'kind': kind or ''})
+    except Exception:
+        pass
+
+
 def inc_scan_runs(status):
     c = _get(
         'forge_scan_runs_total',

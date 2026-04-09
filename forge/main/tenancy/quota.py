@@ -97,6 +97,11 @@ def check_tenant_quota(unified_job, request):
                     result.events.append(ev)
                 except Exception:  # pylint: disable=broad-except
                     logger.exception('Failed to persist TenantQuotaEvent (blocked)')
+                try:
+                    from forge.main.observability.metrics import inc_tenant_quota_blocks
+                    inc_tenant_quota_blocks(kind)
+                except Exception:  # pylint: disable=broad-except
+                    pass
                 blocked = True
                 break
 
