@@ -30,6 +30,36 @@ is_otlp_http = helpers.is_otlp_http
 validate_sampler_arg = helpers.validate_sampler_arg
 aggregate_health = helpers.aggregate_health
 should_recheck_health = helpers.should_recheck_health
+parse_env_bool = helpers.parse_env_bool
+
+
+class TestParseEnvBool(unittest.TestCase):
+    def test_true_string(self):
+        self.assertTrue(parse_env_bool('true'))
+
+    def test_one(self):
+        self.assertTrue(parse_env_bool('1'))
+
+    def test_yes(self):
+        self.assertTrue(parse_env_bool('yes'))
+
+    def test_on(self):
+        self.assertTrue(parse_env_bool('ON'))
+
+    def test_false(self):
+        self.assertFalse(parse_env_bool('false'))
+
+    def test_zero(self):
+        self.assertFalse(parse_env_bool('0'))
+
+    def test_empty(self):
+        self.assertFalse(parse_env_bool(''))
+
+    def test_none(self):
+        self.assertFalse(parse_env_bool(None))
+
+    def test_garbage(self):
+        self.assertFalse(parse_env_bool('maybe'))
 
 
 class TestParseResourceAttributes(unittest.TestCase):
