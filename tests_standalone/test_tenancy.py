@@ -454,5 +454,36 @@ class TestTokenBucketLua(unittest.TestCase):
         self.assertIn('EXPIRE', TOKEN_BUCKET_LUA)
 
 
+# ---------------------------------------------------------------------------
+# Multi-Tenancy v2: Celery Queue helper tests
+# ---------------------------------------------------------------------------
+
+tenant_queue_name_fn = helpers.tenant_queue_name
+TENANT_QUEUE_PREFIX = helpers.TENANT_QUEUE_PREFIX
+
+
+class TestTenantQueueName(unittest.TestCase):
+    """Test tenant queue name generation."""
+
+    def test_valid_org_id(self):
+        self.assertEqual(tenant_queue_name_fn(42), 'tenant-42')
+
+    def test_string_org_id(self):
+        self.assertEqual(tenant_queue_name_fn('99'), 'tenant-99')
+
+    def test_none_returns_empty(self):
+        self.assertEqual(tenant_queue_name_fn(None), '')
+
+    def test_zero_returns_empty(self):
+        self.assertEqual(tenant_queue_name_fn(0), '')
+
+    def test_prefix_constant(self):
+        self.assertEqual(TENANT_QUEUE_PREFIX, 'tenant-')
+
+    def test_name_starts_with_prefix(self):
+        name = tenant_queue_name_fn(1)
+        self.assertTrue(name.startswith(TENANT_QUEUE_PREFIX))
+
+
 if __name__ == '__main__':
     unittest.main()

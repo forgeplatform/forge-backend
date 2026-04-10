@@ -1583,6 +1583,11 @@ class UnifiedJob(
         return r
 
     def get_queue_name(self):
+        # Multi-Tenancy v2: route to tenant-specific queue if enabled.
+        from forge.main.tenancy.queues import get_queue_for_job
+        tenant_queue = get_queue_for_job(self)
+        if tenant_queue:
+            return tenant_queue
         return self.controller_node or self.execution_node or get_task_queuename()
 
     @property

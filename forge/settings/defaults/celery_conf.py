@@ -46,6 +46,11 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(seconds=300),
         'options': {'expires': 280},
     },
+    'tenancy_ensure_queues': {
+        'task': 'forge.main.tasks.tenancy.ensure_all_tenant_queues',
+        'schedule': timedelta(seconds=600),
+        'options': {'expires': 580},
+    },
 }
 
 # Django Caching Configuration

@@ -77,4 +77,13 @@ def provision_tenant(payload):
     # TenantUsage row
     TenantUsage.objects.get_or_create(organization=org)
 
+    # Declare tenant Celery queue (best-effort, beat task will retry).
+    try:
+        from django.conf import settings
+        if getattr(settings, 'TENANCY_DEDICATED_QUEUES_ENABLED', False):
+            from forge.main.tenancy.queues import ensure_tenant_queue_exists
+            ensure_tenant_queue_exists(org.pk)
+    except Exception:  # pylint: disable=broad-except
+        logger.debug('Failed to declare tenant queue for %s', org.name, exc_info=True)
+
     return org

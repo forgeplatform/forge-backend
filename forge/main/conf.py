@@ -1253,3 +1253,30 @@ register(
     category=_('System'),
     category_slug='system',
 )
+
+register(
+    'TENANCY_DEDICATED_QUEUES_ENABLED',
+    field_class=fields.BooleanField,
+    default=False,
+    label=_('Per-tenant Celery Queues Enabled'),
+    help_text=_(
+        'Route tenant jobs to dedicated Celery queues (tenant-{org_id}). '
+        'Workers must subscribe to tenant queues for this to work. '
+        'Requires TENANCY_ENABLED=True.'
+    ),
+    category=_('System'),
+    category_slug='system',
+)
+
+register(
+    'TENANCY_QUEUE_FALLBACK_TIMEOUT_S',
+    field_class=fields.IntegerField,
+    default=30,
+    label=_('Tenant Queue Fallback Timeout (s)'),
+    help_text=_(
+        'Seconds to wait before re-routing a tenant job to the default queue '
+        'if no worker picks it up from the tenant queue.'
+    ),
+    category=_('System'),
+    category_slug='system',
+)

@@ -207,6 +207,24 @@ def compute_token_bucket_params(rate_limit, burst_multiplier=2):
 
 
 # ---------------------------------------------------------------------------
+# Per-tenant Celery Queues — v2
+# ---------------------------------------------------------------------------
+
+TENANT_QUEUE_PREFIX = 'tenant-'
+
+
+def tenant_queue_name(org_id):
+    """Return the Celery queue name for a tenant organization.
+
+    Convention: ``tenant-{org_id}``, e.g. ``tenant-42``.
+    Returns ``''`` if org_id is None/falsy.
+    """
+    if not org_id:
+        return ''
+    return f'{TENANT_QUEUE_PREFIX}{int(org_id)}'
+
+
+# ---------------------------------------------------------------------------
 # Row-Level Security (RLS) — v2
 # ---------------------------------------------------------------------------
 
