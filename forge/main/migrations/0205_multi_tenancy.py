@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0203_scanner'),
+        ('main', '0204_audit_event'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

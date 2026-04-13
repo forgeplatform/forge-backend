@@ -53,7 +53,7 @@ def _build_reverse_sql():
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0204_multi_tenancy'),
+        ('main', '0205_multi_tenancy'),
     ]
 
     operations = [

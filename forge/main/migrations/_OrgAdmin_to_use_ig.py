@@ -1,11 +1,10 @@
 import logging
 
-from forge.main.models import Organization
-
 logger = logging.getLogger('forge.main.migrations')
 
 
 def migrate_org_admin_to_use(apps, schema_editor):
+    Organization = apps.get_model('main', 'Organization')
     logger.info('Initiated migration from Org admin to use role')
     roles_added = 0
     for org in Organization.objects.prefetch_related('admin_role__members').iterator(chunk_size=1000):
