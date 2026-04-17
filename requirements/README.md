@@ -4,7 +4,7 @@ The `requirements.txt` file is generated from `requirements.in` and `requirement
 
 ## How To Use
 
-Commands should be run in the awx container from inside the `./requirements` directory of the awx repository.
+Commands should be run in the **forge container** from inside the `./requirements` directory of the forge-backend repository.
 
 ### Upgrading or Adding Select Libraries
 

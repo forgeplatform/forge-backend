@@ -24,7 +24,7 @@ forge/
 ├── settings/     # Django settings (development, production)
 ├── playbooks/    # Ansible playbooks for job execution
 ├── locale/       # Internationalization
-└── ui/           # Legacy UI (awx compatibility)
+└── ui/           # Legacy UI (retained for AWX compatibility internals)
 ```
 
 ## Development
@@ -50,6 +50,8 @@ See [docs/11-api-reference.md](docs/11-api-reference.md) for the complete refere
 
 ## Documentation
 
+### Core
+
 - [Backend Django](docs/02-backend-django.md)
 - [Task Engine](docs/04-task-engine.md)
 - [Authentication & RBAC](docs/05-authentication-rbac.md)
@@ -57,6 +59,20 @@ See [docs/11-api-reference.md](docs/11-api-reference.md) for the complete refere
 - [Testing Guide](docs/09-testing-guide.md)
 - [API Reference](docs/11-api-reference.md)
 - [Configuration Reference](docs/12-configuration-reference.md)
+
+### Features
+
+- [Dynamic Surveys](docs/13-dynamic-surveys.md)
+- [Audit Trail](docs/14-audit-trail.md)
+- [Event-Driven Automation](docs/15-event-driven-automation.md)
+- [Drift Detection](docs/16-drift-detection.md)
+- [Self-Service Portal](docs/17-self-service-portal.md)
+- [OIDC + WebAuthn](docs/18-oidc-webauthn.md)
+- [Policy-as-Code (OPA)](docs/19-policy-as-code.md)
+- [IaC Scanning](docs/20-iac-scanning.md)
+- [Observability (OpenTelemetry)](docs/21-observability.md)
+- [Multi-Tenancy](docs/22-multi-tenancy.md)
+- [Recommendations](docs/23-recommendations.md)
 
 ## Docker
 
