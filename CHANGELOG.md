@@ -7,6 +7,8 @@ and the project adheres to CalVer (`YYYY.MM.PATCH`).
 
 ## [Unreleased]
 
+## [2026.05.0] - 2026-05-22
+
 ### Fixed
 - `DriftAlertRule` rows could not be cascade-deleted from an
   Organization: the original `0198_drift_models` migration omitted
