@@ -10,30 +10,30 @@ Set in `tools/docker-compose-prod/.env`.
 
 ### Core (required)
 
-| Variable | Description | Generate with... |
-|----------|-------------|-----------------|
-| `POSTGRES_PASSWORD` | DB password | `openssl rand -base64 24` |
-| `FORGE_SECRET_KEY` | Django crypto key | `openssl rand -base64 32` |
-| `FORGE_BROADCAST_WEBSOCKET_SECRET` | WS auth secret | `openssl rand -base64 32` |
-| `FORGE_ADMIN_PASSWORD` | Admin password | Manually — strong password |
-| `FORGE_CSRF_TRUSTED_ORIGINS` | CSRF origins | `https://forge.example.com` |
+| Variable                           | Description       | Generate with...            |
+| ---------------------------------- | ----------------- | --------------------------- |
+| `POSTGRES_PASSWORD`                | DB password       | `openssl rand -base64 24`   |
+| `FORGE_SECRET_KEY`                 | Django crypto key | `openssl rand -base64 32`   |
+| `FORGE_BROADCAST_WEBSOCKET_SECRET` | WS auth secret    | `openssl rand -base64 32`   |
+| `FORGE_ADMIN_PASSWORD`             | Admin password    | Manually — strong password  |
+| `FORGE_CSRF_TRUSTED_ORIGINS`       | CSRF origins      | `https://forge.example.com` |
 
 ### Optional
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `FORGE_IMAGE` | `forge-platform/forge` | Docker image |
-| `FORGE_TAG` | `latest` | Image tag |
-| `POSTGRES_USER` | `forge` | DB user |
-| `POSTGRES_DB` | `forge` | DB name |
-| `FORGE_ADMIN_USER` | `admin` | Admin username |
-| `FORGE_ALLOWED_HOSTS` | `*` | Allowed HTTP hosts |
-| `FORGE_NODE_NAME` | `forge-node` | Cluster node name |
-| `FORGE_NODE_TYPE` | `hybrid` | `hybrid` / `control` / `execution` |
-| `NGINX_HTTP_PORT` | `80` | HTTP port |
-| `NGINX_HTTPS_PORT` | `443` | HTTPS port |
-| `SESSION_COOKIE_SECURE` | `True` | Cookie only over HTTPS |
-| `CSRF_COOKIE_SECURE` | `True` | CSRF cookie only over HTTPS |
+| Variable                | Default                | Description                        |
+| ----------------------- | ---------------------- | ---------------------------------- |
+| `FORGE_IMAGE`           | `forge-platform/forge` | Docker image                       |
+| `FORGE_TAG`             | `latest`               | Image tag                          |
+| `POSTGRES_USER`         | `forge`                | DB user                            |
+| `POSTGRES_DB`           | `forge`                | DB name                            |
+| `FORGE_ADMIN_USER`      | `admin`                | Admin username                     |
+| `FORGE_ALLOWED_HOSTS`   | `*`                    | Allowed HTTP hosts                 |
+| `FORGE_NODE_NAME`       | `forge-node`           | Cluster node name                  |
+| `FORGE_NODE_TYPE`       | `hybrid`               | `hybrid` / `control` / `execution` |
+| `NGINX_HTTP_PORT`       | `80`                   | HTTP port                          |
+| `NGINX_HTTPS_PORT`      | `443`                  | HTTPS port                         |
+| `SESSION_COOKIE_SECURE` | `True`                 | Cookie only over HTTPS             |
+| `CSRF_COOKIE_SECURE`    | `True`                 | CSRF cookie only over HTTPS        |
 
 ### Watch out
 
@@ -61,14 +61,14 @@ Loaded in order (later ones override earlier):
 
 ### Key default files
 
-| File | What it controls |
-|------|-----------------|
-| `defaults/base.py` | DATABASES, INSTALLED_APPS, REST_FRAMEWORK |
-| `defaults/auth.py` | Authentication backends |
-| `defaults/jobs.py` | Job execution defaults |
-| `defaults/celery_conf.py` | Celery/Redis |
-| `defaults/logging_conf.py` | Logging levels and formats |
-| `production.py` | DEBUG=False, ALLOWED_HOSTS, security |
+| File                       | What it controls                          |
+| -------------------------- | ----------------------------------------- |
+| `defaults/base.py`         | DATABASES, INSTALLED_APPS, REST_FRAMEWORK |
+| `defaults/auth.py`         | Authentication backends                   |
+| `defaults/jobs.py`         | Job execution defaults                    |
+| `defaults/celery_conf.py`  | Celery/Redis                              |
+| `defaults/logging_conf.py` | Logging levels and formats                |
+| `production.py`            | DEBUG=False, ALLOWED_HOSTS, security      |
 
 ---
 
@@ -78,36 +78,36 @@ Access via API: `/api/v2/settings/`
 
 ### Job Settings (`/api/v2/settings/jobs/`)
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `SCHEDULE_MAX_JOBS` | `10` | Max concurrent runs of the same scheduled template |
-| `AWX_TASK_ENV` | `{}` | Extra env variables for ALL playbook runs |
-| `DEFAULT_JOB_TIMEOUT` | `0` | Global job timeout in seconds (0 = no limit) |
-| `DEFAULT_INVENTORY_UPDATE_TIMEOUT` | `0` | Inventory sync timeout |
-| `DEFAULT_PROJECT_UPDATE_TIMEOUT` | `0` | Project sync timeout |
-| `MAX_FORKS` | `200` | Maximum forks per job |
-| `AWX_ROLES_ENABLED` | `True` | Allow Ansible roles download |
-| `AWX_COLLECTIONS_ENABLED` | `True` | Allow Ansible collections download |
-| `PROJECT_UPDATE_VVV` | `False` | Verbose project sync output |
+| Setting                            | Default | Description                                        |
+| ---------------------------------- | ------- | -------------------------------------------------- |
+| `SCHEDULE_MAX_JOBS`                | `10`    | Max concurrent runs of the same scheduled template |
+| `AWX_TASK_ENV`                     | `{}`    | Extra env variables for ALL playbook runs          |
+| `DEFAULT_JOB_TIMEOUT`              | `0`     | Global job timeout in seconds (0 = no limit)       |
+| `DEFAULT_INVENTORY_UPDATE_TIMEOUT` | `0`     | Inventory sync timeout                             |
+| `DEFAULT_PROJECT_UPDATE_TIMEOUT`   | `0`     | Project sync timeout                               |
+| `MAX_FORKS`                        | `200`   | Maximum forks per job                              |
+| `AWX_ROLES_ENABLED`                | `True`  | Allow Ansible roles download                       |
+| `AWX_COLLECTIONS_ENABLED`          | `True`  | Allow Ansible collections download                 |
+| `PROJECT_UPDATE_VVV`               | `False` | Verbose project sync output                        |
 
 ### Auth Settings (`/api/v2/settings/authentication/`)
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `SESSION_COOKIE_AGE` | `1800` | Session timeout in seconds (30 min) |
-| `SESSIONS_PER_USER` | `-1` | Max concurrent sessions (-1 = unlimited) |
-| `AUTH_BASIC_ENABLED` | `True` | Allow Basic auth for API |
-| `ALLOW_OAUTH2_FOR_EXTERNAL_USERS` | `False` | SSO users can create tokens |
+| Setting                           | Default | Description                              |
+| --------------------------------- | ------- | ---------------------------------------- |
+| `SESSION_COOKIE_AGE`              | `1800`  | Session timeout in seconds (30 min)      |
+| `SESSIONS_PER_USER`               | `-1`    | Max concurrent sessions (-1 = unlimited) |
+| `AUTH_BASIC_ENABLED`              | `True`  | Allow Basic auth for API                 |
+| `ALLOW_OAUTH2_FOR_EXTERNAL_USERS` | `False` | SSO users can create tokens              |
 
 ### Logging Settings (`/api/v2/settings/logging/`)
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `LOG_AGGREGATOR_HOST` | `None` | External log collector hostname |
-| `LOG_AGGREGATOR_PORT` | `None` | Port |
-| `LOG_AGGREGATOR_TYPE` | `None` | `logstash`, `splunk`, `loggly`, `sumologic` |
-| `LOG_AGGREGATOR_ENABLED` | `False` | Enable log forwarding |
-| `LOG_AGGREGATOR_LEVEL` | `WARNING` | Minimum level |
+| Setting                  | Default   | Description                                 |
+| ------------------------ | --------- | ------------------------------------------- |
+| `LOG_AGGREGATOR_HOST`    | `None`    | External log collector hostname             |
+| `LOG_AGGREGATOR_PORT`    | `None`    | Port                                        |
+| `LOG_AGGREGATOR_TYPE`    | `None`    | `logstash`, `splunk`, `loggly`, `sumologic` |
+| `LOG_AGGREGATOR_ENABLED` | `False`   | Enable log forwarding                       |
+| `LOG_AGGREGATOR_LEVEL`   | `WARNING` | Minimum level                               |
 
 ---
 
@@ -204,9 +204,9 @@ Effective     = whichever is smaller
 
 ### Recommended Hardware
 
-| Size | CPU | RAM | Disk |
-|------|-----|-----|------|
-| Small (≤100 hosts) | 4 | 8GB | 50GB SSD |
-| Medium (≤1000) | 8 | 16GB | 100GB SSD |
-| Large (≤10000) | 16 | 32GB | 200GB SSD |
+| Size                | CPU | RAM   | Disk      |
+| ------------------- | --- | ----- | --------- |
+| Small (≤100 hosts)  | 4   | 8GB   | 50GB SSD  |
+| Medium (≤1000)      | 8   | 16GB  | 100GB SSD |
+| Large (≤10000)      | 16  | 32GB  | 200GB SSD |
 | Enterprise (10000+) | 16+ | 64GB+ | 500GB SSD |

@@ -11,11 +11,11 @@ Forge provides two complementary audit mechanisms:
 
 The existing `ActivityStream` model now captures request metadata on every entry:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `actor_ip` | GenericIPAddressField | IP address of the actor (supports X-Forwarded-For) |
-| `actor_user_agent` | CharField(512) | User-Agent header from the request |
-| `actor_session_id` | CharField(64) | Django session ID at the time of the event |
+| Field              | Type                  | Description                                        |
+| ------------------ | --------------------- | -------------------------------------------------- |
+| `actor_ip`         | GenericIPAddressField | IP address of the actor (supports X-Forwarded-For) |
+| `actor_user_agent` | CharField(512)        | User-Agent header from the request                 |
+| `actor_session_id` | CharField(64)         | Django session ID at the time of the event         |
 
 These fields are automatically populated by `RequestContextMiddleware` which
 extracts the data from each incoming HTTP request and stores it in thread-local
@@ -56,30 +56,31 @@ Audit Events focus on security-sensitive operations:
 ### Immutability
 
 Audit events are append-only:
+
 - `save()` raises `ValueError` if the entry already has a primary key (no updates)
 - `delete()` raises `ValueError` (no deletions)
 - Records can only be created, never modified or removed
 
 ### Model Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `timestamp` | DateTimeField | Auto-populated creation time (indexed) |
-| `actor` | ForeignKey(User) | User who triggered the event (nullable) |
-| `actor_username` | CharField | Denormalized username (survives user deletion) |
-| `actor_ip` | GenericIPAddressField | Source IP address |
-| `actor_user_agent` | CharField(512) | User-Agent string |
-| `actor_session_id` | CharField(64) | Session ID |
-| `category` | CharField | `auth`, `credential_access`, `permission_change`, `resource_change`, `system` |
-| `severity` | CharField | `info`, `warning`, `critical` |
-| `action` | CharField | Specific action, e.g. `login`, `credential_used`, `role_granted` |
-| `description` | TextField | Human-readable event description |
-| `resource_type` | CharField | Affected resource type (e.g. `credential`, `team`) |
-| `resource_id` | IntegerField | ID of affected resource |
-| `resource_name` | CharField | Name of affected resource (denormalized) |
-| `action_node` | CharField | Cluster node where event occurred |
-| `detail` | JSONField | Additional structured data |
-| `organization` | ForeignKey | Organization scope (for RBAC filtering) |
+| Field              | Type                  | Description                                                                   |
+| ------------------ | --------------------- | ----------------------------------------------------------------------------- |
+| `timestamp`        | DateTimeField         | Auto-populated creation time (indexed)                                        |
+| `actor`            | ForeignKey(User)      | User who triggered the event (nullable)                                       |
+| `actor_username`   | CharField             | Denormalized username (survives user deletion)                                |
+| `actor_ip`         | GenericIPAddressField | Source IP address                                                             |
+| `actor_user_agent` | CharField(512)        | User-Agent string                                                             |
+| `actor_session_id` | CharField(64)         | Session ID                                                                    |
+| `category`         | CharField             | `auth`, `credential_access`, `permission_change`, `resource_change`, `system` |
+| `severity`         | CharField             | `info`, `warning`, `critical`                                                 |
+| `action`           | CharField             | Specific action, e.g. `login`, `credential_used`, `role_granted`              |
+| `description`      | TextField             | Human-readable event description                                              |
+| `resource_type`    | CharField             | Affected resource type (e.g. `credential`, `team`)                            |
+| `resource_id`      | IntegerField          | ID of affected resource                                                       |
+| `resource_name`    | CharField             | Name of affected resource (denormalized)                                      |
+| `action_node`      | CharField             | Cluster node where event occurred                                             |
+| `detail`           | JSONField             | Additional structured data                                                    |
+| `organization`     | ForeignKey            | Organization scope (for RBAC filtering)                                       |
 
 ---
 
@@ -93,34 +94,39 @@ GET /api/v2/audit_events/
 
 **Query Parameters:**
 
-| Parameter | Description |
-|-----------|-------------|
-| `category` | Filter by category: `auth`, `credential_access`, `permission_change`, `resource_change`, `system` |
-| `severity` | Filter by severity: `info`, `warning`, `critical` |
-| `action` | Filter by specific action string |
-| `actor__username` | Filter by actor username |
-| `resource_type` | Filter by resource type |
-| `resource_id` | Filter by resource ID |
-| `timestamp__gte` | Events after this ISO datetime |
-| `timestamp__lte` | Events before this ISO datetime |
-| `organization` | Filter by organization ID |
-| `format` | Response format: `json` (default), `csv`, `siem` |
+| Parameter         | Description                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
+| `category`        | Filter by category: `auth`, `credential_access`, `permission_change`, `resource_change`, `system` |
+| `severity`        | Filter by severity: `info`, `warning`, `critical`                                                 |
+| `action`          | Filter by specific action string                                                                  |
+| `actor__username` | Filter by actor username                                                                          |
+| `resource_type`   | Filter by resource type                                                                           |
+| `resource_id`     | Filter by resource ID                                                                             |
+| `timestamp__gte`  | Events after this ISO datetime                                                                    |
+| `timestamp__lte`  | Events before this ISO datetime                                                                   |
+| `organization`    | Filter by organization ID                                                                         |
+| `format`          | Response format: `json` (default), `csv`, `siem`                                                  |
 
 ### Export Formats
 
 **CSV Export:**
+
 ```
 GET /api/v2/audit_events/?format=csv
 ```
+
 Returns a streaming CSV download (max 10,000 rows) with columns:
 id, timestamp, actor_username, actor_ip, category, severity, action,
 description, resource_type, resource_id, resource_name, action_node.
 
 **SIEM JSON Export:**
+
 ```
 GET /api/v2/audit_events/?format=siem
 ```
+
 Returns flat JSON optimized for SIEM ingestion (Splunk, ELK, Datadog):
+
 - `detail` dict fields are flattened with `detail_` prefix
 - `source: "forge"` and `event_type: "<category>.<action>"` are added
 - No nested objects — every field is at the top level

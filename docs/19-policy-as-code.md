@@ -67,16 +67,16 @@ to the full request.
 
 ### `Policy(CommonModelNameNotUnique)`
 
-| Field | Notes |
-|---|---|
-| `organization` | FK Organization (null = global) |
-| `rego_module` | Full Rego source — pushed to OPA on save |
-| `package_path` | OPA Data path queried, e.g. `forge.launch` |
-| `enforcement` | `none` / `warn` / `enforce` |
-| `enabled` | bool |
-| `applies_to` | JSON list of resource types (`job_template`, `workflow_job_template`, `ad_hoc_command`); empty = all |
-| `trigger_count`, `last_triggered_at`, `last_evaluated_at` | populated by the evaluator |
-| `last_sync_status` | `ok` / `failed` / blank — set by the post_save signal |
+| Field                                                     | Notes                                                                                                |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `organization`                                            | FK Organization (null = global)                                                                      |
+| `rego_module`                                             | Full Rego source — pushed to OPA on save                                                             |
+| `package_path`                                            | OPA Data path queried, e.g. `forge.launch`                                                           |
+| `enforcement`                                             | `none` / `warn` / `enforce`                                                                          |
+| `enabled`                                                 | bool                                                                                                 |
+| `applies_to`                                              | JSON list of resource types (`job_template`, `workflow_job_template`, `ad_hoc_command`); empty = all |
+| `trigger_count`, `last_triggered_at`, `last_evaluated_at` | populated by the evaluator                                                                           |
+| `last_sync_status`                                        | `ok` / `failed` / blank — set by the post_save signal                                                |
 
 `Organization.policy_enforcement` (`none/warn/enforce`, default `none`)
 gates everything for the org.
@@ -155,10 +155,10 @@ The context document shape:
   "resource_name": "Restart nginx",
   "organization_id": 1,
   "organization_name": "Default",
-  "user": {"id": 5, "username": "alice", "is_superuser": false},
-  "extra_vars": {"hostname": "web01"},
-  "inventory": {"id": 7, "name": "prod-web", "kind": ""},
-  "credentials": [{"id": 3, "name": "prod-ssh", "kind": "ssh"}],
+  "user": { "id": 5, "username": "alice", "is_superuser": false },
+  "extra_vars": { "hostname": "web01" },
+  "inventory": { "id": 7, "name": "prod-web", "kind": "" },
+  "credentials": [{ "id": 3, "name": "prod-ssh", "kind": "ssh" }],
   "playbook": "restart_nginx.yml",
   "now_iso": "2026-04-08T19:30:00Z",
   "client_ip": "10.0.0.42"
@@ -181,12 +181,12 @@ an org in `warn` never blocks even if a policy is `enforce`.
 
 Registered under the **Security** category:
 
-| Setting | Default | Notes |
-|---|---|---|
-| `OPA_ENABLED` | `False` | Master switch |
-| `OPA_SERVER_URL` | `http://forge-opa:8181` | Base URL of the sidecar |
-| `OPA_EVALUATION_TIMEOUT_MS` | `2000` | Per-evaluation timeout |
-| `OPA_FAIL_MODE` | `allow` | What happens when OPA is unreachable. `allow` = fail-open, `deny` = fail-closed. |
+| Setting                     | Default                 | Notes                                                                            |
+| --------------------------- | ----------------------- | -------------------------------------------------------------------------------- |
+| `OPA_ENABLED`               | `False`                 | Master switch                                                                    |
+| `OPA_SERVER_URL`            | `http://forge-opa:8181` | Base URL of the sidecar                                                          |
+| `OPA_EVALUATION_TIMEOUT_MS` | `2000`                  | Per-evaluation timeout                                                           |
+| `OPA_FAIL_MODE`             | `allow`                 | What happens when OPA is unreachable. `allow` = fail-open, `deny` = fail-closed. |
 
 ---
 
@@ -194,15 +194,15 @@ Registered under the **Security** category:
 
 Mounted under `/api/v2/policies/` and `/api/v2/policy_decisions/`.
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET / POST | `/api/v2/policies/` | List + create |
-| GET / PATCH / DELETE | `/api/v2/policies/{id}/` | CRUD |
-| POST | `/api/v2/policies/{id}/enable/` | Enable |
-| POST | `/api/v2/policies/{id}/disable/` | Disable |
-| POST | `/api/v2/policies/{id}/test/` | Dry-run with `{input}` |
-| GET | `/api/v2/policy_decisions/` | List (filter: `decision`, `policy`, `unified_job`, `since`) |
-| GET | `/api/v2/policy_decisions/{id}/` | Detail |
+| Method               | Path                             | Purpose                                                     |
+| -------------------- | -------------------------------- | ----------------------------------------------------------- |
+| GET / POST           | `/api/v2/policies/`              | List + create                                               |
+| GET / PATCH / DELETE | `/api/v2/policies/{id}/`         | CRUD                                                        |
+| POST                 | `/api/v2/policies/{id}/enable/`  | Enable                                                      |
+| POST                 | `/api/v2/policies/{id}/disable/` | Disable                                                     |
+| POST                 | `/api/v2/policies/{id}/test/`    | Dry-run with `{input}`                                      |
+| GET                  | `/api/v2/policy_decisions/`      | List (filter: `decision`, `policy`, `unified_job`, `since`) |
+| GET                  | `/api/v2/policy_decisions/{id}/` | Detail                                                      |
 
 ---
 
@@ -230,6 +230,7 @@ Run with: `python -m unittest tests_standalone.test_policy -v`
 3. PATCH an organization's `policy_enforcement` to `enforce`.
 4. Create a Policy via the UI: `applies_to=[job_template]`,
    `enforcement=enforce`, package `forge.launch`, body:
+
    ```rego
    package forge.launch
    default deny := false
@@ -239,6 +240,7 @@ Run with: `python -m unittest tests_standalone.test_policy -v`
      hour >= 18
    }
    ```
+
 5. Try to launch a JT with the prod-web inventory after 18:00 → 403 +
    PolicyDecision row with decision `deny`.
 6. Stop OPA, set `OPA_FAIL_MODE=deny`, retry → blocked with

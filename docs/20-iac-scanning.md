@@ -57,47 +57,47 @@ empty allow-immediately `ScanRunResult`.
 
 ### `Scanner(CommonModelNameNotUnique)`
 
-| Field | Notes |
-|---|---|
-| `organization` | FK Organization (null = global) |
-| `description` | TextField |
-| `tool` | `ansible-lint` / `checkov` / `pip-audit` |
-| `config` | JSONField — adapter-specific opts (excludes, profile, etc.) |
-| `severity_threshold` | `info` / `low` / `medium` / `high` / `critical` |
-| `enforcement` | `warn` / `enforce` |
-| `enabled` | bool |
-| `applies_to` | JSON list: `job_template`, `workflow_job_template`, `ad_hoc_command` (empty = all) |
-| `trigger_count`, `last_run_at`, `last_run_status` | populated by the runner |
+| Field                                             | Notes                                                                              |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `organization`                                    | FK Organization (null = global)                                                    |
+| `description`                                     | TextField                                                                          |
+| `tool`                                            | `ansible-lint` / `checkov` / `pip-audit`                                           |
+| `config`                                          | JSONField — adapter-specific opts (excludes, profile, etc.)                        |
+| `severity_threshold`                              | `info` / `low` / `medium` / `high` / `critical`                                    |
+| `enforcement`                                     | `warn` / `enforce`                                                                 |
+| `enabled`                                         | bool                                                                               |
+| `applies_to`                                      | JSON list: `job_template`, `workflow_job_template`, `ad_hoc_command` (empty = all) |
+| `trigger_count`, `last_run_at`, `last_run_status` | populated by the runner                                                            |
 
 ### `ScanResult(CreatedModifiedModel)`
 
 One row per scanner execution.
 
-| Field | Notes |
-|---|---|
-| `scanner` | FK Scanner (SET_NULL) |
-| `scanner_name` | Cached name so historical rows survive delete |
-| `unified_job` | FK UnifiedJob (SET_NULL) — nulled when the launch was blocked |
-| `unified_job_template` | FK UnifiedJobTemplate (SET_NULL) |
-| `organization` | FK Organization (SET_NULL) |
-| `triggered_by` | FK auth.User (SET_NULL) |
-| `status` | `ok` / `warn` / `blocked` / `error` / `timeout` |
-| `duration_ms` | Wall-clock scanner runtime |
-| `finding_count` | Findings at or above threshold |
-| `highest_severity` | Cached for filtering / audit UI |
-| `message` | Short summary (first finding) |
-| `raw_output` | Truncated stdout/stderr (`SCANNER_RAW_OUTPUT_MAX` bytes) |
+| Field                  | Notes                                                         |
+| ---------------------- | ------------------------------------------------------------- |
+| `scanner`              | FK Scanner (SET_NULL)                                         |
+| `scanner_name`         | Cached name so historical rows survive delete                 |
+| `unified_job`          | FK UnifiedJob (SET_NULL) — nulled when the launch was blocked |
+| `unified_job_template` | FK UnifiedJobTemplate (SET_NULL)                              |
+| `organization`         | FK Organization (SET_NULL)                                    |
+| `triggered_by`         | FK auth.User (SET_NULL)                                       |
+| `status`               | `ok` / `warn` / `blocked` / `error` / `timeout`               |
+| `duration_ms`          | Wall-clock scanner runtime                                    |
+| `finding_count`        | Findings at or above threshold                                |
+| `highest_severity`     | Cached for filtering / audit UI                               |
+| `message`              | Short summary (first finding)                                 |
+| `raw_output`           | Truncated stdout/stderr (`SCANNER_RAW_OUTPUT_MAX` bytes)      |
 
 ### `ScanFinding(BaseModel)`
 
-| Field | Notes |
-|---|---|
-| `scan_result` | FK ScanResult CASCADE |
-| `rule_id` | e.g. `yaml[line-length]`, `CKV_ANSIBLE_*`, PyPI advisory id |
-| `severity` | Normalized to `info/low/medium/high/critical` |
-| `file_path` | Relative to project checkout |
-| `line` | Optional |
-| `message` | Human-readable |
+| Field         | Notes                                                       |
+| ------------- | ----------------------------------------------------------- |
+| `scan_result` | FK ScanResult CASCADE                                       |
+| `rule_id`     | e.g. `yaml[line-length]`, `CKV_ANSIBLE_*`, PyPI advisory id |
+| `severity`    | Normalized to `info/low/medium/high/critical`               |
+| `file_path`   | Relative to project checkout                                |
+| `line`        | Optional                                                    |
+| `message`     | Human-readable                                              |
 
 Migration: `forge/main/migrations/0203_scanner.py`. All three models are
 registered with `permission_registry` and `activity_stream_registrar`.
@@ -129,11 +129,11 @@ parse_output(stdout, stderr, returncode) -> list[NormalizedFinding]
 `NormalizedFinding` (from `forge.main.scanning.types`) has
 `rule_id, severity, file_path, line, message`.
 
-| Adapter | CLI invocation | Severity mapping |
-|---|---|---|
-| `ansible_lint.py` | `ansible-lint -f json --strict <playbook>` | Rule tag → info/low/medium/high/critical. `very_high`/`security` → high; `med`/`medium` → medium; `info`/`notice` → info. |
-| `checkov.py` | `checkov -f <playbook> --framework ansible -o json` | `CRITICAL`→critical, `HIGH`→high, `MEDIUM`→medium, `LOW`→low; anything else → info. |
-| `pip_audit.py` | `pip-audit -r <requirements.txt> --format json` | OSV severity field → mapped directly; missing → medium by default. |
+| Adapter           | CLI invocation                                      | Severity mapping                                                                                                          |
+| ----------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `ansible_lint.py` | `ansible-lint -f json --strict <playbook>`          | Rule tag → info/low/medium/high/critical. `very_high`/`security` → high; `med`/`medium` → medium; `info`/`notice` → info. |
+| `checkov.py`      | `checkov -f <playbook> --framework ansible -o json` | `CRITICAL`→critical, `HIGH`→high, `MEDIUM`→medium, `LOW`→low; anything else → info.                                       |
+| `pip_audit.py`    | `pip-audit -r <requirements.txt> --format json`     | OSV severity field → mapped directly; missing → medium by default.                                                        |
 
 A tool registry in `forge/main/scanning/tools/__init__.py` exposes
 `get_adapter(tool_name)` used by the runner.
@@ -189,12 +189,12 @@ the FK cascade doesn't lose the audit row when the view deletes the job.
 
 Registered under the **Security** category:
 
-| Setting | Default | Notes |
-|---|---|---|
-| `SCANNER_ENABLED` | `False` | Master switch; runner is a no-op otherwise. |
-| `SCANNER_TIMEOUT_S` | `120` | Per-scanner subprocess timeout in seconds. |
-| `SCANNER_FAIL_MODE` | `allow` | What to do when a scanner crashes/times out. `allow` = fail-open (warn row logged), `deny` = fail-closed (launch blocked). |
-| `SCANNER_RAW_OUTPUT_MAX` | `8192` | Bytes of tool stdout/stderr kept on each `ScanResult.raw_output`. |
+| Setting                  | Default | Notes                                                                                                                      |
+| ------------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `SCANNER_ENABLED`        | `False` | Master switch; runner is a no-op otherwise.                                                                                |
+| `SCANNER_TIMEOUT_S`      | `120`   | Per-scanner subprocess timeout in seconds.                                                                                 |
+| `SCANNER_FAIL_MODE`      | `allow` | What to do when a scanner crashes/times out. `allow` = fail-open (warn row logged), `deny` = fail-closed (launch blocked). |
+| `SCANNER_RAW_OUTPUT_MAX` | `8192`  | Bytes of tool stdout/stderr kept on each `ScanResult.raw_output`.                                                          |
 
 ---
 
@@ -232,14 +232,14 @@ if scan_result.warn_messages:
 
 Mounted under `/api/v2/scanners/` and `/api/v2/scan_results/`.
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET / POST | `/api/v2/scanners/` | List + create |
-| GET / PATCH / DELETE | `/api/v2/scanners/{id}/` | CRUD |
-| POST | `/api/v2/scanners/{id}/enable/` | Enable |
-| POST | `/api/v2/scanners/{id}/disable/` | Disable |
-| GET | `/api/v2/scan_results/` | List (filter: `scanner`, `status`, `unified_job`, `since`) |
-| GET | `/api/v2/scan_results/{id}/` | Detail with embedded findings |
+| Method               | Path                             | Purpose                                                    |
+| -------------------- | -------------------------------- | ---------------------------------------------------------- |
+| GET / POST           | `/api/v2/scanners/`              | List + create                                              |
+| GET / PATCH / DELETE | `/api/v2/scanners/{id}/`         | CRUD                                                       |
+| POST                 | `/api/v2/scanners/{id}/enable/`  | Enable                                                     |
+| POST                 | `/api/v2/scanners/{id}/disable/` | Disable                                                    |
+| GET                  | `/api/v2/scan_results/`          | List (filter: `scanner`, `status`, `unified_job`, `since`) |
+| GET                  | `/api/v2/scan_results/{id}/`     | Detail with embedded findings                              |
 
 ---
 
@@ -253,7 +253,7 @@ Standalone unit tests, no Django bootstrap (same pattern as
 - `aggregate_status` — no findings → `ok`; below threshold → `ok`;
   at/above + warn → `warn`; at/above + enforce → `blocked`.
 - `fail_mode_decision` — (unavailable, `allow`) → `allow`;
-  (unavailable, `deny`) → `deny`; (available, *) → `allow`.
+  (unavailable, `deny`) → `deny`; (available, \*) → `allow`.
 - Adapter parsers fed canned JSON fixtures (ansible-lint, checkov,
   pip-audit) → expected NormalizedFinding lists.
 - `applies_to` resource matching (empty list = all; subset match).

@@ -11,11 +11,11 @@ time instead of at template definition time.
 Standard surveys require choices to be hardcoded in the survey spec. Dynamic
 surveys resolve choices from three configurable sources:
 
-| Source | Description | Use Case |
-|--------|-------------|----------|
-| **Database Query** | Query Forge models (hosts, groups, projects, etc.) | Select a host from inventory |
-| **External API** | Fetch choices from an HTTP endpoint | Options from CMDB, ServiceNow, etc. |
-| **Jinja2 Template** | Evaluate a Jinja2 expression | Custom logic using inventory data |
+| Source              | Description                                        | Use Case                            |
+| ------------------- | -------------------------------------------------- | ----------------------------------- |
+| **Database Query**  | Query Forge models (hosts, groups, projects, etc.) | Select a host from inventory        |
+| **External API**    | Fetch choices from an HTTP endpoint                | Options from CMDB, ServiceNow, etc. |
+| **Jinja2 Template** | Evaluate a Jinja2 expression                       | Custom logic using inventory data   |
 
 Results are cached with a configurable TTL to avoid slow launches.
 
@@ -57,11 +57,11 @@ A survey question with dynamic choices includes a `dynamic_choices` field:
 
 ### dynamic_choices Configuration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `enabled` | boolean | Yes | Enable/disable dynamic choices |
-| `source_type` | string | Yes (if enabled) | One of: `db_query`, `api_endpoint`, `jinja2` |
-| `cache_ttl` | integer | No (default: 60) | Cache duration in seconds (0 = no cache) |
+| Field         | Type    | Required         | Description                                  |
+| ------------- | ------- | ---------------- | -------------------------------------------- |
+| `enabled`     | boolean | Yes              | Enable/disable dynamic choices               |
+| `source_type` | string  | Yes (if enabled) | One of: `db_query`, `api_endpoint`, `jinja2` |
+| `cache_ttl`   | integer | No (default: 60) | Cache duration in seconds (0 = no cache)     |
 
 ---
 
@@ -85,16 +85,16 @@ Query Forge database models and return a field value as choices.
 
 ### Allowed Models
 
-| Key | Model | Example Use |
-|-----|-------|-------------|
-| `hosts` | Host | Select target hosts |
-| `groups` | Group | Select host groups |
-| `projects` | Project | Select project |
-| `inventories` | Inventory | Select inventory |
-| `credentials` | Credential | Select credential |
-| `organizations` | Organization | Select organization |
-| `execution_environments` | ExecutionEnvironment | Select EE |
-| `templates` | JobTemplate | Select template |
+| Key                      | Model                | Example Use         |
+| ------------------------ | -------------------- | ------------------- |
+| `hosts`                  | Host                 | Select target hosts |
+| `groups`                 | Group                | Select host groups  |
+| `projects`               | Project              | Select project      |
+| `inventories`            | Inventory            | Select inventory    |
+| `credentials`            | Credential           | Select credential   |
+| `organizations`          | Organization         | Select organization |
+| `execution_environments` | ExecutionEnvironment | Select EE           |
+| `templates`              | JobTemplate          | Select template     |
 
 ### Allowed Fields
 
@@ -129,34 +129,37 @@ Fetch choices from an HTTP endpoint. Supports JSON responses.
 }
 ```
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `url` | string | — | HTTP endpoint URL (required) |
-| `method` | string | `GET` | HTTP method (`GET` or `POST`) |
-| `headers` | object | `{}` | Custom HTTP headers |
-| `json_path` | string | `""` | Dot-notation path to the array in response |
-| `value_field` | string | `""` | Field to extract from objects in the array |
-| `timeout` | integer | `10` | Request timeout in seconds |
-| `body` | object | `{}` | Request body for POST method |
+| Field         | Type    | Default | Description                                |
+| ------------- | ------- | ------- | ------------------------------------------ |
+| `url`         | string  | —       | HTTP endpoint URL (required)               |
+| `method`      | string  | `GET`   | HTTP method (`GET` or `POST`)              |
+| `headers`     | object  | `{}`    | Custom HTTP headers                        |
+| `json_path`   | string  | `""`    | Dot-notation path to the array in response |
+| `value_field` | string  | `""`    | Field to extract from objects in the array |
+| `timeout`     | integer | `10`    | Request timeout in seconds                 |
+| `body`        | object  | `{}`    | Request body for POST method               |
 
 ### Response Formats
 
 **Simple list:**
+
 ```json
 ["server1", "server2", "server3"]
 ```
 
 **Nested with json_path and value_field:**
+
 ```json
 {
   "data": {
     "items": [
-      {"hostname": "web-01", "ip": "10.0.1.1"},
-      {"hostname": "web-02", "ip": "10.0.1.2"}
+      { "hostname": "web-01", "ip": "10.0.1.1" },
+      { "hostname": "web-02", "ip": "10.0.1.2" }
     ]
   }
 }
 ```
+
 With `json_path: "data.items"` and `value_field: "hostname"`, this returns
 `["web-01", "web-02"]`.
 
@@ -177,9 +180,9 @@ Evaluate a Jinja2 expression that outputs a JSON array.
 
 ### Available Context Variables
 
-| Variable | Type | Description |
-|----------|------|-------------|
-| `hosts` | list[str] | Host names from the template's inventory |
+| Variable | Type      | Description                               |
+| -------- | --------- | ----------------------------------------- |
+| `hosts`  | list[str] | Host names from the template's inventory  |
 | `groups` | list[str] | Group names from the template's inventory |
 
 The template **must output a valid JSON array**.

@@ -75,19 +75,19 @@ tenants never consume policy/scanning work. A post-finish signal decrements
 11 additive fields on the existing `Organization` model. All default to
 `False` / `null` / empty string so existing orgs are untouched.
 
-| Field                          | Type                    | Purpose |
-|--------------------------------|-------------------------|---------|
-| `is_tenant_root`               | BooleanField (False)    | Marks org as a tenant boundary |
-| `tenant_max_concurrent_jobs`   | PositiveIntegerField ?  | Concurrent running jobs cap |
-| `tenant_max_daily_launches`    | PositiveIntegerField ?  | Rolling daily launch cap |
-| `tenant_max_hosts`             | PositiveIntegerField ?  | Host count cap |
-| `tenant_max_storage_mb`        | PositiveIntegerField ?  | Project storage cap |
-| `tenant_isolation_strict`      | BooleanField (False)    | Flip on → audit cross-tenant reads |
-| `tenant_logo_url`              | CharField (blank)       | Branding logo |
-| `tenant_primary_color`         | CharField (blank)       | Hex color (`#5B47E0`) |
-| `tenant_secondary_color`       | CharField (blank)       | Hex color |
-| `tenant_custom_domain`         | CharField (blank, idx)  | Hostname used by branding lookup |
-| `tenant_contact_email`         | EmailField (blank)      | Primary contact |
+| Field                        | Type                   | Purpose                            |
+| ---------------------------- | ---------------------- | ---------------------------------- |
+| `is_tenant_root`             | BooleanField (False)   | Marks org as a tenant boundary     |
+| `tenant_max_concurrent_jobs` | PositiveIntegerField ? | Concurrent running jobs cap        |
+| `tenant_max_daily_launches`  | PositiveIntegerField ? | Rolling daily launch cap           |
+| `tenant_max_hosts`           | PositiveIntegerField ? | Host count cap                     |
+| `tenant_max_storage_mb`      | PositiveIntegerField ? | Project storage cap                |
+| `tenant_isolation_strict`    | BooleanField (False)   | Flip on → audit cross-tenant reads |
+| `tenant_logo_url`            | CharField (blank)      | Branding logo                      |
+| `tenant_primary_color`       | CharField (blank)      | Hex color (`#5B47E0`)              |
+| `tenant_secondary_color`     | CharField (blank)      | Hex color                          |
+| `tenant_custom_domain`       | CharField (blank, idx) | Hostname used by branding lookup   |
+| `tenant_contact_email`       | EmailField (blank)     | Primary contact                    |
 
 `null` on any quota means **unlimited**.
 
@@ -97,45 +97,45 @@ One row per tenant Org. The launch hook reads/writes
 `concurrent_jobs_count` / `launches_today_count`; the beat task refreshes
 `hosts_count` / `storage_mb_used`.
 
-| Field                           | Type |
-|---------------------------------|------|
-| `organization`                  | OneToOneField(Organization, related_name='tenant_usage') |
-| `concurrent_jobs_count`         | PositiveIntegerField (0) |
-| `launches_today_count`          | PositiveIntegerField (0) |
-| `launches_today_window_start`   | DateTimeField |
-| `hosts_count`                   | PositiveIntegerField (0) |
-| `storage_mb_used`               | PositiveIntegerField (0) |
-| `last_recalculated_at`          | DateTimeField (null) |
+| Field                         | Type                                                     |
+| ----------------------------- | -------------------------------------------------------- |
+| `organization`                | OneToOneField(Organization, related_name='tenant_usage') |
+| `concurrent_jobs_count`       | PositiveIntegerField (0)                                 |
+| `launches_today_count`        | PositiveIntegerField (0)                                 |
+| `launches_today_window_start` | DateTimeField                                            |
+| `hosts_count`                 | PositiveIntegerField (0)                                 |
+| `storage_mb_used`             | PositiveIntegerField (0)                                 |
+| `last_recalculated_at`        | DateTimeField (null)                                     |
 
 ### TenantQuotaEvent (new)
 
 One row per quota decision. Mirrors `PolicyDecision` shape.
 
-| Field                   | Type |
-|-------------------------|------|
-| `organization`          | FK Organization SET_NULL |
-| `organization_name`     | CharField (cached — row survives org delete) |
-| `quota_kind`            | choices=`concurrent_jobs` / `daily_launches` / `hosts` / `storage_mb` |
-| `decision`              | choices=`allowed` / `blocked` |
-| `current_value`         | PositiveIntegerField |
-| `limit_value`           | PositiveIntegerField (null when unlimited) |
-| `triggered_by`          | FK auth.User SET_NULL |
-| `unified_job_template`  | FK UnifiedJobTemplate SET_NULL |
-| `message`               | TextField |
+| Field                  | Type                                                                  |
+| ---------------------- | --------------------------------------------------------------------- |
+| `organization`         | FK Organization SET_NULL                                              |
+| `organization_name`    | CharField (cached — row survives org delete)                          |
+| `quota_kind`           | choices=`concurrent_jobs` / `daily_launches` / `hosts` / `storage_mb` |
+| `decision`             | choices=`allowed` / `blocked`                                         |
+| `current_value`        | PositiveIntegerField                                                  |
+| `limit_value`          | PositiveIntegerField (null when unlimited)                            |
+| `triggered_by`         | FK auth.User SET_NULL                                                 |
+| `unified_job_template` | FK UnifiedJobTemplate SET_NULL                                        |
+| `message`              | TextField                                                             |
 
 ### TenantIsolationEvent (new)
 
 One row per cross-tenant read observed when `tenant_isolation_strict=True`.
 
-| Field                     | Type |
-|---------------------------|------|
-| `user`                    | FK auth.User SET_NULL |
-| `user_organization`       | FK Organization SET_NULL |
-| `accessed_organization`   | FK Organization SET_NULL |
-| `resource_type`           | CharField |
-| `resource_id`             | PositiveIntegerField (null) |
-| `request_path`            | CharField |
-| `blocked`                 | BooleanField (False — v1 audit only) |
+| Field                   | Type                                 |
+| ----------------------- | ------------------------------------ |
+| `user`                  | FK auth.User SET_NULL                |
+| `user_organization`     | FK Organization SET_NULL             |
+| `accessed_organization` | FK Organization SET_NULL             |
+| `resource_type`         | CharField                            |
+| `resource_id`           | PositiveIntegerField (null)          |
+| `request_path`          | CharField                            |
+| `blocked`               | BooleanField (False — v1 audit only) |
 
 ---
 
@@ -159,15 +159,15 @@ All four quota kinds use `check_quota_value` so the semantics are identical
 
 ## Tenancy package layout — `forge/main/tenancy/`
 
-| Module            | Role |
-|-------------------|------|
-| `__init__.py`     | Re-exports the public surface |
-| `helpers.py`      | Pure functions (standalone-testable) |
+| Module            | Role                                                                      |
+| ----------------- | ------------------------------------------------------------------------- | ----- |
+| `__init__.py`     | Re-exports the public surface                                             |
+| `helpers.py`      | Pure functions (standalone-testable)                                      |
 | `quota.py`        | `QuotaResult`, `check_tenant_quota(job, request)`, `on_job_finished(job)` |
-| `provisioning.py` | `provision_tenant(payload)` — atomic Org + User + Team + Usage |
-| `branding.py`     | `get_branding_for_host(host) -> dict | None` |
-| `usage.py`        | `recalculate_tenant_usage(org)` — drift reconciliation |
-| `isolation.py`    | `TenantIsolationMiddleware` — cross-tenant audit (v1 log only) |
+| `provisioning.py` | `provision_tenant(payload)` — atomic Org + User + Team + Usage            |
+| `branding.py`     | `get_branding_for_host(host) -> dict                                      | None` |
+| `usage.py`        | `recalculate_tenant_usage(org)` — drift reconciliation                    |
+| `isolation.py`    | `TenantIsolationMiddleware` — cross-tenant audit (v1 log only)            |
 
 ---
 
@@ -198,12 +198,12 @@ on every tick.
 
 ## Settings — `forge/main/conf.py`
 
-| Key                                   | Default | Notes |
-|---------------------------------------|---------|-------|
+| Key                                   | Default | Notes                                          |
+| ------------------------------------- | ------- | ---------------------------------------------- |
 | `TENANCY_ENABLED`                     | `False` | Kill switch — all gates short-circuit when off |
-| `TENANCY_DEFAULT_MAX_CONCURRENT_JOBS` | `0`     | `0` = unlimited |
-| `TENANCY_DEFAULT_MAX_DAILY_LAUNCHES`  | `0`     | `0` = unlimited |
-| `TENANCY_QUOTA_RECALC_INTERVAL_S`     | `300`   | Beat task period |
+| `TENANCY_DEFAULT_MAX_CONCURRENT_JOBS` | `0`     | `0` = unlimited                                |
+| `TENANCY_DEFAULT_MAX_DAILY_LAUNCHES`  | `0`     | `0` = unlimited                                |
+| `TENANCY_QUOTA_RECALC_INTERVAL_S`     | `300`   | Beat task period                               |
 
 All four live under the **System** category and show up in
 `/api/v2/settings/system/`.
@@ -215,16 +215,16 @@ All four live under the **System** category and show up in
 All `/api/v2/tenants/*` endpoints require `is_superuser`. `/api/v2/branding/`
 is **public** (no auth classes).
 
-| Method | Path                                       | Purpose |
-|--------|--------------------------------------------|---------|
-| GET    | `/api/v2/tenants/`                         | List tenant orgs with embedded usage + quota |
-| POST   | `/api/v2/tenants/`                         | Provision a tenant (Org + admin + team + usage, all in one txn) |
-| GET    | `/api/v2/tenants/{id}/`                    | Detail (nested usage, quota, branding) |
-| PATCH  | `/api/v2/tenants/{id}/`                    | Update quotas / branding |
-| DELETE | `/api/v2/tenants/{id}/?confirm=true`       | Wipe org + all its content (fails if running jobs > 0) |
-| POST   | `/api/v2/tenants/{id}/recalculate/`        | Force usage recompute |
-| GET    | `/api/v2/tenant_quota_events/`             | Audit log |
-| GET    | `/api/v2/branding/?host=<hostname>`        | **PUBLIC** — tenant branding lookup, 404 on miss |
+| Method | Path                                 | Purpose                                                         |
+| ------ | ------------------------------------ | --------------------------------------------------------------- |
+| GET    | `/api/v2/tenants/`                   | List tenant orgs with embedded usage + quota                    |
+| POST   | `/api/v2/tenants/`                   | Provision a tenant (Org + admin + team + usage, all in one txn) |
+| GET    | `/api/v2/tenants/{id}/`              | Detail (nested usage, quota, branding)                          |
+| PATCH  | `/api/v2/tenants/{id}/`              | Update quotas / branding                                        |
+| DELETE | `/api/v2/tenants/{id}/?confirm=true` | Wipe org + all its content (fails if running jobs > 0)          |
+| POST   | `/api/v2/tenants/{id}/recalculate/`  | Force usage recompute                                           |
+| GET    | `/api/v2/tenant_quota_events/`       | Audit log                                                       |
+| GET    | `/api/v2/branding/?host=<hostname>`  | **PUBLIC** — tenant branding lookup, 404 on miss                |
 
 ### Provisioning payload
 

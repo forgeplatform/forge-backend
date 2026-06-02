@@ -72,23 +72,23 @@ A frozen aggregation of everything the rules need. Built once per request (or
 once per minute when the cache is warm) by `build_context()`, which runs
 defensive lazy queries against the existing tables.
 
-| Field | Type | Source |
-|---|---|---|
-| `scanners_enabled_count` | `int` | `Scanner.objects.filter(enabled=True).count()` |
-| `policies_total` | `int` | `Policy.objects.count()` |
-| `policies_enforce_count` | `int` | `Policy.objects.filter(mode='enforce').count()` |
-| `organizations_total` | `int` | `Organization.objects.count()` |
-| `tenancy_enabled` | `bool` | `settings.TENANCY_ENABLED` |
-| `otel_enabled` | `bool` | `settings.OTEL_ENABLED` |
-| `job_templates_total` | `int` | `JobTemplate.objects.count()` |
-| `schedules_total` | `int` | `Schedule.objects.count()` |
-| `catalog_items_total` | `int` | `CatalogItem.objects.count()` |
-| `surveys_total` | `int` | `JobTemplate.objects.exclude(survey_spec=None).count()` |
-| `drift_detections_total` | `int` | `DriftDetection.objects.count()` |
-| `projects` | `list[(name, last_sync)]` | `Project.objects.values_list('name', 'last_update_failed')` |
-| `tenant_usage` | `list[(name, quota_pct)]` | `TenantUsage` aggregate |
-| `teams_count` | `int` | `Team.objects.count()` |
-| `admin_default_password` | `bool` | `User.check_password('password')` for admin |
+| Field                    | Type                      | Source                                                      |
+| ------------------------ | ------------------------- | ----------------------------------------------------------- |
+| `scanners_enabled_count` | `int`                     | `Scanner.objects.filter(enabled=True).count()`              |
+| `policies_total`         | `int`                     | `Policy.objects.count()`                                    |
+| `policies_enforce_count` | `int`                     | `Policy.objects.filter(mode='enforce').count()`             |
+| `organizations_total`    | `int`                     | `Organization.objects.count()`                              |
+| `tenancy_enabled`        | `bool`                    | `settings.TENANCY_ENABLED`                                  |
+| `otel_enabled`           | `bool`                    | `settings.OTEL_ENABLED`                                     |
+| `job_templates_total`    | `int`                     | `JobTemplate.objects.count()`                               |
+| `schedules_total`        | `int`                     | `Schedule.objects.count()`                                  |
+| `catalog_items_total`    | `int`                     | `CatalogItem.objects.count()`                               |
+| `surveys_total`          | `int`                     | `JobTemplate.objects.exclude(survey_spec=None).count()`     |
+| `drift_detections_total` | `int`                     | `DriftDetection.objects.count()`                            |
+| `projects`               | `list[(name, last_sync)]` | `Project.objects.values_list('name', 'last_update_failed')` |
+| `tenant_usage`           | `list[(name, quota_pct)]` | `TenantUsage` aggregate                                     |
+| `teams_count`            | `int`                     | `Team.objects.count()`                                      |
+| `admin_default_password` | `bool`                    | `User.check_password('password')` for admin                 |
 
 Each query is wrapped in `try/except` so a missing table (e.g. recommendations
 on a fresh install before migrations finish) returns a zero/false value instead
@@ -111,20 +111,20 @@ class Recommendation:
 
 ## The 12 Rules
 
-| ID | Scope | Severity | Triggers when… |
-|---|---|---|---|
-| `default_admin_password` | `dashboard` | **critical** | The bootstrap `admin` user still has the seed password |
-| `no_scanners` | `compliance` | warn | At least one job template exists but no enabled scanners |
-| `multi_org_no_tenancy` | `tenancy` | warn | More than one Organization but `TENANCY_ENABLED=False` |
-| `tenant_near_quota` | `tenancy` | warn | Any tenant is using > 80% of any quota |
-| `all_policies_warn` | `compliance` | info | At least one policy exists but none are in `enforce` mode |
-| `no_observability` | `dashboard` | info | `OTEL_ENABLED=False` |
-| `stale_project` | `automation` | info | Any Project has not synced in 14+ days |
-| `no_schedules` | `automation` | info | Job templates exist but no Schedules are configured |
-| `no_drift` | `compliance` | info | Job templates exist but no DriftDetections configured |
-| `few_surveys` | `self_service` | info | Less than 50% of templates expose a survey |
-| `no_catalog_items` | `self_service` | info | Job templates exist but the Service Catalog is empty |
-| `only_default_team` | `access` | info | Only the seed Team exists |
+| ID                       | Scope          | Severity     | Triggers when…                                            |
+| ------------------------ | -------------- | ------------ | --------------------------------------------------------- |
+| `default_admin_password` | `dashboard`    | **critical** | The bootstrap `admin` user still has the seed password    |
+| `no_scanners`            | `compliance`   | warn         | At least one job template exists but no enabled scanners  |
+| `multi_org_no_tenancy`   | `tenancy`      | warn         | More than one Organization but `TENANCY_ENABLED=False`    |
+| `tenant_near_quota`      | `tenancy`      | warn         | Any tenant is using > 80% of any quota                    |
+| `all_policies_warn`      | `compliance`   | info         | At least one policy exists but none are in `enforce` mode |
+| `no_observability`       | `dashboard`    | info         | `OTEL_ENABLED=False`                                      |
+| `stale_project`          | `automation`   | info         | Any Project has not synced in 14+ days                    |
+| `no_schedules`           | `automation`   | info         | Job templates exist but no Schedules are configured       |
+| `no_drift`               | `compliance`   | info         | Job templates exist but no DriftDetections configured     |
+| `few_surveys`            | `self_service` | info         | Less than 50% of templates expose a survey                |
+| `no_catalog_items`       | `self_service` | info         | Job templates exist but the Service Catalog is empty      |
+| `only_default_team`      | `access`       | info         | Only the seed Team exists                                 |
 
 Each rule is a pure function `(ctx: RuleContext) -> Recommendation | None`.
 A rule that raises an exception is silently dropped — the engine never returns
@@ -140,9 +140,9 @@ a partial error to the API.
 
 **Query parameters**
 
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `scope` | `str` | `all` | Filter by scope. One of: `all`, `dashboard`, `automation`, `self_service`, `tenancy`, `compliance`, `resources`, `access` |
+| Name    | Type  | Default | Description                                                                                                               |
+| ------- | ----- | ------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `scope` | `str` | `all`   | Filter by scope. One of: `all`, `dashboard`, `automation`, `self_service`, `tenancy`, `compliance`, `resources`, `access` |
 
 **Response 200**
 
@@ -277,11 +277,11 @@ To bypass the cache (for tests), call `build_context(_cache_bust=True)`.
 The frontend uses these conventions; rules should pick severity to match the
 intended urgency.
 
-| Severity | When to use | UI treatment |
-|---|---|---|
-| `critical` | Active security or data-loss risk | Red badge, stays at the top, never auto-dismissable |
-| `warn` | Best-practice violation that will bite later | Amber badge, dismissible per session |
-| `info` | Tip or suggestion | Blue badge, dismissible per session |
+| Severity   | When to use                                  | UI treatment                                        |
+| ---------- | -------------------------------------------- | --------------------------------------------------- |
+| `critical` | Active security or data-loss risk            | Red badge, stays at the top, never auto-dismissable |
+| `warn`     | Best-practice violation that will bite later | Amber badge, dismissible per session                |
+| `info`     | Tip or suggestion                            | Blue badge, dismissible per session                 |
 
 Today only `default_admin_password` is `critical`. Adding new criticals should
 require explicit review — they cannot be silenced from the UI.
@@ -330,9 +330,11 @@ matching the backend cache TTL.
 4. Add a unit test in `tests_standalone/test_recommendations.py`. At minimum
    cover **trigger** and **non-trigger** cases.
 5. Run the tests:
+
    ```bash
    pytest tests_standalone/test_recommendations.py -v
    ```
+
 6. (Optional) add an `i18n` key on the frontend if the title/why should be
    translated rather than served verbatim.
 

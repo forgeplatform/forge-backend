@@ -49,15 +49,15 @@ so it does not slow down job completion.
 
 Point-in-time capture of `ansible_facts` for a single host.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `host` | FK → Host | The host whose facts were captured |
-| `job` | FK → Job (nullable) | The job that triggered the capture |
-| `inventory` | FK → Inventory | Inherited from host |
-| `organization` | FK → Organization | Inherited from inventory |
-| `captured_at` | DateTime | When the snapshot was taken |
-| `facts` | JSON | Full `ansible_facts` dictionary |
-| `facts_hash` | CharField(64) | SHA-256 of sorted JSON — for quick equality check |
+| Field          | Type                | Description                                       |
+| -------------- | ------------------- | ------------------------------------------------- |
+| `host`         | FK → Host           | The host whose facts were captured                |
+| `job`          | FK → Job (nullable) | The job that triggered the capture                |
+| `inventory`    | FK → Inventory      | Inherited from host                               |
+| `organization` | FK → Organization   | Inherited from inventory                          |
+| `captured_at`  | DateTime            | When the snapshot was taken                       |
+| `facts`        | JSON                | Full `ansible_facts` dictionary                   |
+| `facts_hash`   | CharField(64)       | SHA-256 of sorted JSON — for quick equality check |
 
 **Key behavior:** A snapshot is only created when `facts_hash` differs from
 the most recent snapshot for the same host. This prevents storing duplicate
@@ -67,32 +67,32 @@ snapshots when facts haven't changed.
 
 A single detected configuration change between two consecutive snapshots.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `host` | FK → Host | Which host changed |
-| `snapshot_before` | FK → HostFactSnapshot | Previous state |
-| `snapshot_after` | FK → HostFactSnapshot | New state |
-| `job` | FK → Job | Which job caused the change |
-| `category` | CharField | packages, services, users_groups, network, mounts, kernel, other |
-| `severity` | CharField | low, medium, high, critical |
-| `fact_path` | CharField | Top-level fact key (e.g. `ansible_packages`) |
-| `summary` | CharField | Human-readable change description |
-| `detail` | JSON | `{before, after, diff_type}` |
-| `acknowledged` | Boolean | Whether an admin has reviewed this change |
-| `acknowledged_by` | FK → User | Who acknowledged |
-| `acknowledged_at` | DateTime | When acknowledged |
+| Field             | Type                  | Description                                                      |
+| ----------------- | --------------------- | ---------------------------------------------------------------- |
+| `host`            | FK → Host             | Which host changed                                               |
+| `snapshot_before` | FK → HostFactSnapshot | Previous state                                                   |
+| `snapshot_after`  | FK → HostFactSnapshot | New state                                                        |
+| `job`             | FK → Job              | Which job caused the change                                      |
+| `category`        | CharField             | packages, services, users_groups, network, mounts, kernel, other |
+| `severity`        | CharField             | low, medium, high, critical                                      |
+| `fact_path`       | CharField             | Top-level fact key (e.g. `ansible_packages`)                     |
+| `summary`         | CharField             | Human-readable change description                                |
+| `detail`          | JSON                  | `{before, after, diff_type}`                                     |
+| `acknowledged`    | Boolean               | Whether an admin has reviewed this change                        |
+| `acknowledged_by` | FK → User             | Who acknowledged                                                 |
+| `acknowledged_at` | DateTime              | When acknowledged                                                |
 
 ### Category Classification
 
-| Category | Matched facts | Default severity |
-|----------|---------------|-----------------|
-| `packages` | ansible_packages, ansible_pkg_mgr, *package*, *pip* | medium |
-| `services` | ansible_services, ansible_service_mgr, *systemd* | medium |
-| `users_groups` | ansible_user_*, *user*, *group*, *passwd* | high |
-| `network` | ansible_all_ipv4/6_addresses, ansible_interfaces, *tcp*, *port* | high |
-| `mounts` | ansible_mounts, ansible_devices, *disk*, *lvm* | medium |
-| `kernel` | ansible_kernel*, ansible_sysctl, ansible_selinux | critical |
-| `other` | Everything else | low |
+| Category       | Matched facts                                                    | Default severity |
+| -------------- | ---------------------------------------------------------------- | ---------------- |
+| `packages`     | ansible*packages, ansible_pkg_mgr, \_package*, *pip*             | medium           |
+| `services`     | ansible*services, ansible_service_mgr, \_systemd*                | medium           |
+| `users_groups` | ansible*user\*\*, *user*, *group*,*passwd\*                      | high             |
+| `network`      | ansible*all_ipv4/6_addresses, ansible_interfaces, \_tcp*, *port* | high             |
+| `mounts`       | ansible*mounts, ansible_devices, \_disk*, *lvm*                  | medium           |
+| `kernel`       | ansible_kernel\*, ansible_sysctl, ansible_selinux                | critical         |
+| `other`        | Everything else                                                  | low              |
 
 **Volatile keys skipped:** `ansible_date_time`, `ansible_uptime_seconds`,
 `ansible_local`, `module_setup`, `gather_subset`.
@@ -101,32 +101,32 @@ A single detected configuration change between two consecutive snapshots.
 
 User-defined rule for alerting when drift exceeds a threshold.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | CharField | Rule name (unique per org) |
-| `organization` | FK → Organization | Scope |
-| `enabled` | Boolean | Active or paused |
-| `inventory` | FK → Inventory (optional) | Filter by inventory |
-| `host_filter` | CharField | fnmatch pattern (e.g. `web-*`) |
-| `categories` | JSON list | Which drift categories to match (empty = all) |
-| `severity_min` | CharField | Minimum severity to count (low/medium/high/critical) |
-| `threshold_count` | Integer | How many drift items trigger the alert |
-| `threshold_window_minutes` | Integer | Time window for counting |
-| `cooldown_minutes` | Integer | Minimum time between alert firings |
-| `notification_template` | FK → NotificationTemplate | Where to send alert |
+| Field                      | Type                      | Description                                          |
+| -------------------------- | ------------------------- | ---------------------------------------------------- |
+| `name`                     | CharField                 | Rule name (unique per org)                           |
+| `organization`             | FK → Organization         | Scope                                                |
+| `enabled`                  | Boolean                   | Active or paused                                     |
+| `inventory`                | FK → Inventory (optional) | Filter by inventory                                  |
+| `host_filter`              | CharField                 | fnmatch pattern (e.g. `web-*`)                       |
+| `categories`               | JSON list                 | Which drift categories to match (empty = all)        |
+| `severity_min`             | CharField                 | Minimum severity to count (low/medium/high/critical) |
+| `threshold_count`          | Integer                   | How many drift items trigger the alert               |
+| `threshold_window_minutes` | Integer                   | Time window for counting                             |
+| `cooldown_minutes`         | Integer                   | Minimum time between alert firings                   |
+| `notification_template`    | FK → NotificationTemplate | Where to send alert                                  |
 
 ### DriftAlert
 
 Immutable record of a triggered alert.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `alert_rule` | FK → DriftAlertRule | Which rule triggered |
-| `host` | FK → Host | Which host caused it |
-| `drift_count` | Integer | How many drift items were counted |
-| `summary` | Text | Human-readable description |
-| `notification_status` | CharField | pending, sent, failed |
-| `notification_error` | Text | Error message if send failed |
+| Field                 | Type                | Description                       |
+| --------------------- | ------------------- | --------------------------------- |
+| `alert_rule`          | FK → DriftAlertRule | Which rule triggered              |
+| `host`                | FK → Host           | Which host caused it              |
+| `drift_count`         | Integer             | How many drift items were counted |
+| `summary`             | Text                | Human-readable description        |
+| `notification_status` | CharField           | pending, sent, failed             |
+| `notification_error`  | Text                | Error message if send failed      |
 
 ---
 
@@ -225,15 +225,15 @@ Periodic task `cleanup_old_snapshots` runs as a Celery beat task:
 
 Four pages under the **Compliance** sidebar section:
 
-| Page | Route | Description |
-|------|-------|-------------|
-| Drift Detections | `/drift_detections` | Filterable list with category/severity badges, CSV export |
-| Drift Detection Detail | `/drift_detections/:id` | Before/after JSON diff, acknowledge button |
-| Drift Alert Rules | `/drift_alert_rules` | CRUD list with create/edit/enable/disable |
-| Drift Alert Rule Detail | `/drift_alert_rules/:id` | Config summary, recent triggered alerts |
-| Drift Alerts | `/drift_alerts` | Read-only list of triggered alerts |
-| Drift Alert Detail | `/drift_alerts/:id` | Alert summary, notification status/error |
-| Fact Snapshots | `/fact_snapshots` | Browse captured snapshots by host/job |
+| Page                    | Route                    | Description                                               |
+| ----------------------- | ------------------------ | --------------------------------------------------------- |
+| Drift Detections        | `/drift_detections`      | Filterable list with category/severity badges, CSV export |
+| Drift Detection Detail  | `/drift_detections/:id`  | Before/after JSON diff, acknowledge button                |
+| Drift Alert Rules       | `/drift_alert_rules`     | CRUD list with create/edit/enable/disable                 |
+| Drift Alert Rule Detail | `/drift_alert_rules/:id` | Config summary, recent triggered alerts                   |
+| Drift Alerts            | `/drift_alerts`          | Read-only list of triggered alerts                        |
+| Drift Alert Detail      | `/drift_alerts/:id`      | Alert summary, notification status/error                  |
+| Fact Snapshots          | `/fact_snapshots`        | Browse captured snapshots by host/job                     |
 
 ---
 

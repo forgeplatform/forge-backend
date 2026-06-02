@@ -64,14 +64,14 @@ Called from `forge/asgi.py`, `forge/wsgi.py`, and the Celery worker boot hook
 All registered in `forge/main/conf.py` under category `System`. Env wins on
 first boot; subsequent changes can be made in **Settings → System**.
 
-| Key                        | Default                                   | Meaning                              |
-|----------------------------|-------------------------------------------|--------------------------------------|
-| `OTEL_ENABLED`             | `false`                                   | Master switch                        |
-| `OTEL_EXPORTER_ENDPOINT`   | `http://forge-otel-collector:4317`        | OTLP gRPC endpoint                   |
-| `OTEL_SERVICE_NAME`        | `forge`                                   | `service.name` resource attribute    |
-| `OTEL_RESOURCE_ATTRIBUTES` | `""`                                      | Comma-separated `k=v` pairs          |
-| `OTEL_TRACES_SAMPLER`      | `parentbased_traceidratio`                | Standard OTel sampler names          |
-| `OTEL_TRACES_SAMPLER_ARG`  | `0.1`                                     | Ratio in [0,1] (validated)           |
+| Key                        | Default                            | Meaning                           |
+| -------------------------- | ---------------------------------- | --------------------------------- |
+| `OTEL_ENABLED`             | `false`                            | Master switch                     |
+| `OTEL_EXPORTER_ENDPOINT`   | `http://forge-otel-collector:4317` | OTLP gRPC endpoint                |
+| `OTEL_SERVICE_NAME`        | `forge`                            | `service.name` resource attribute |
+| `OTEL_RESOURCE_ATTRIBUTES` | `""`                               | Comma-separated `k=v` pairs       |
+| `OTEL_TRACES_SAMPLER`      | `parentbased_traceidratio`         | Standard OTel sampler names       |
+| `OTEL_TRACES_SAMPLER_ARG`  | `0.1`                              | Ratio in [0,1] (validated)        |
 
 ## Span instrumentation seams
 
@@ -92,14 +92,14 @@ is covered by the auto-instrumentations.
 
 Exposed by `forge/main/observability/metrics.py`:
 
-| Metric                             | Type      | Labels                    | Emitted from              |
-|------------------------------------|-----------|---------------------------|---------------------------|
-| `forge_jobs_launched_total`        | counter   | `status, template_type`   | launch hook               |
-| `forge_jobs_blocked_total`         | counter   | `gate` (policy\|scanner)  | launch hook               |
-| `forge_job_duration_seconds`       | histogram | —                         | `UnifiedJob` finish hook  |
-| `forge_policy_evaluations_total`   | counter   | `decision`                | policy evaluator          |
-| `forge_scan_runs_total`            | counter   | `status`                  | scanner runner            |
-| `forge_active_jobs`                | gauge     | —                         | Celery beat every 30 s    |
+| Metric                           | Type      | Labels                   | Emitted from             |
+| -------------------------------- | --------- | ------------------------ | ------------------------ |
+| `forge_jobs_launched_total`      | counter   | `status, template_type`  | launch hook              |
+| `forge_jobs_blocked_total`       | counter   | `gate` (policy\|scanner) | launch hook              |
+| `forge_job_duration_seconds`     | histogram | —                        | `UnifiedJob` finish hook |
+| `forge_policy_evaluations_total` | counter   | `decision`               | policy evaluator         |
+| `forge_scan_runs_total`          | counter   | `status`                 | scanner runner           |
+| `forge_active_jobs`              | gauge     | —                        | Celery beat every 30 s   |
 
 All handles are cheap no-ops when `OTEL_ENABLED=false`.
 
@@ -141,5 +141,5 @@ Collector endpoint (500 ms timeout, cached for 30 s).
   of the default `debug` exporter.
 - Wire Prometheus alerts back into EDA rules for a closed feedback loop.
 - Validate `forge-deploy/k8s/` manifest stubs against a real cluster (see
-  `forge-deploy/docs/future_development_plan.md` → *Infrastructure & Test
-  Environments*).
+  `forge-deploy/docs/future_development_plan.md` → _Infrastructure & Test
+  Environments_).

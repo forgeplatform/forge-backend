@@ -8,25 +8,27 @@ permissions work.
 
 ## Authentication Methods
 
-| Method | Used for | How it works |
-|--------|----------|--------------|
-| Session (cookie) | Browser UI | Login form → session cookie |
-| OAuth2 Bearer Token | API clients, scripts | `Authorization: Bearer <token>` |
-| Basic Auth | Simple API calls | `Authorization: Basic base64(user:pass)` |
-| LDAP | Enterprise directory | Bind to LDAP server, map groups |
-| SAML 2.0 | Enterprise SSO | SAML assertion from Identity Provider |
-| Social Auth | GitHub, Google, Azure AD | OAuth2 flow with provider |
-| RADIUS | Network authentication | RADIUS server |
+| Method              | Used for                 | How it works                             |
+| ------------------- | ------------------------ | ---------------------------------------- |
+| Session (cookie)    | Browser UI               | Login form → session cookie              |
+| OAuth2 Bearer Token | API clients, scripts     | `Authorization: Bearer <token>`          |
+| Basic Auth          | Simple API calls         | `Authorization: Basic base64(user:pass)` |
+| LDAP                | Enterprise directory     | Bind to LDAP server, map groups          |
+| SAML 2.0            | Enterprise SSO           | SAML assertion from Identity Provider    |
+| Social Auth         | GitHub, Google, Azure AD | OAuth2 flow with provider                |
+| RADIUS              | Network authentication   | RADIUS server                            |
 
 ---
 
 ## Session Authentication (Browser)
 
 The user logs in with username/password and receives two cookies:
+
 - `awx_sessionid` — HttpOnly, Secure. JS cannot read it.
 - `csrftoken` — JS reads it and sends it as the `X-CSRFToken` header on every POST/PATCH/DELETE.
 
 **Watch out:**
+
 - Sessions last **30 minutes** (default). Every request resets the timer.
 - `SESSION_COOKIE_SECURE=True` — the cookie is only sent over HTTPS. If you're testing
   on HTTP, login won't work. Set to `False` for local development.
@@ -58,6 +60,7 @@ curl -H 'Authorization: Bearer <token>' \
 ```
 
 **Watch out:**
+
 - Token scope: `read` (GET only) or `write` (everything)
 - Default token expiry is very long (~1000 years). For security, rotate tokens
   periodically and delete old ones: `forge-manage cleanup_tokens`
@@ -98,11 +101,13 @@ LDAP is configured via the API: `PATCH /api/v2/settings/ldap/`
 Configured via: `PATCH /api/v2/settings/saml/`
 
 You need to define:
+
 - SP (Service Provider) Entity ID, certificate, and key
 - IDP (Identity Provider) configuration: entity_id, SSO URL, X.509 certificate
 - Attribute mapping: which SAML attributes correspond to email, name, etc.
 
 **Watch out:**
+
 - The SAML metadata endpoint is at `https://forge.example.com/sso/metadata/saml/`
   — give this to your IDP for automatic configuration.
 - SAML requires valid HTTPS certificates on both sides.
@@ -114,10 +119,12 @@ You need to define:
 Configured via: `PATCH /api/v2/settings/github/` (or `google-oauth2/`, `azuread-oauth2/`)
 
 You need:
+
 - Client ID and Secret from the OAuth2 provider
 - Organization/Team mapping (optional)
 
 **Watch out:**
+
 - The callback URL you must register with the provider:
   `https://forge.example.com/sso/complete/github-org/`
 - GitHub Enterprise has separate configuration with custom URLs.
@@ -133,22 +140,22 @@ Users and teams are assigned to roles to gain access.
 
 ### Role Types
 
-| Role | What it allows |
-|------|---------------|
-| `admin_role` | Full CRUD access to the resource |
-| `read_role` | Read-only access |
-| `use_role` | Use the resource (e.g., a credential in a job) |
-| `execute_role` | Launch/run the template |
-| `update_role` | Trigger updates (project sync, inventory sync) |
-| `adhoc_role` | Run ad-hoc commands on inventory |
-| `approval_role` | Approve workflow approval nodes |
+| Role            | What it allows                                 |
+| --------------- | ---------------------------------------------- |
+| `admin_role`    | Full CRUD access to the resource               |
+| `read_role`     | Read-only access                               |
+| `use_role`      | Use the resource (e.g., a credential in a job) |
+| `execute_role`  | Launch/run the template                        |
+| `update_role`   | Trigger updates (project sync, inventory sync) |
+| `adhoc_role`    | Run ad-hoc commands on inventory               |
+| `approval_role` | Approve workflow approval nodes                |
 
 ### System-Wide Roles
 
-| Role | Scope |
-|------|-------|
+| Role                   | Scope                                 |
+| ---------------------- | ------------------------------------- |
 | `system_administrator` | Full access to EVERYTHING (superuser) |
-| `system_auditor` | Read-only access to EVERYTHING |
+| `system_auditor`       | Read-only access to EVERYTHING        |
 
 ### Hierarchy — How roles are inherited
 

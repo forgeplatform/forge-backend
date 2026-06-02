@@ -55,17 +55,17 @@ and the frontend "Sign in with OIDC" button.
 
 ### `WebAuthnCredential(CreatedModifiedModel)`
 
-| Field | Notes |
-|---|---|
-| `user` | FK auth.User (CASCADE) |
-| `credential_id` | BinaryField unique — raw cred ID from authenticator |
-| `public_key` | BinaryField — COSE pubkey |
-| `sign_count` | Authenticator counter; replay protection |
-| `transports` | JSON list (`usb`/`nfc`/`ble`/`internal`/`hybrid`) |
-| `aaguid` | Authenticator AAGUID |
-| `label` | User-facing nickname |
-| `last_used_at` | Updated on every successful assertion |
-| `backup_eligible` / `backup_state` | Multi-device hint flags |
+| Field                              | Notes                                               |
+| ---------------------------------- | --------------------------------------------------- |
+| `user`                             | FK auth.User (CASCADE)                              |
+| `credential_id`                    | BinaryField unique — raw cred ID from authenticator |
+| `public_key`                       | BinaryField — COSE pubkey                           |
+| `sign_count`                       | Authenticator counter; replay protection            |
+| `transports`                       | JSON list (`usb`/`nfc`/`ble`/`internal`/`hybrid`)   |
+| `aaguid`                           | Authenticator AAGUID                                |
+| `label`                            | User-facing nickname                                |
+| `last_used_at`                     | Updated on every successful assertion               |
+| `backup_eligible` / `backup_state` | Multi-device hint flags                             |
 
 ### Challenge models
 
@@ -91,17 +91,18 @@ but rejects equal-or-decreasing counts otherwise.
 
 Mounted under `/api/v2/webauthn/`.
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `credentials/` | List the calling user's credentials |
-| PATCH | `credentials/{id}/` | Rename (`{label}`) |
-| DELETE | `credentials/{id}/` | Delete |
-| POST | `register/begin/` | Returns `publicKeyCredentialCreationOptions` JSON; stores a fresh challenge |
-| POST | `register/complete/` | Verifies attestation with `webauthn.verify_registration_response`, persists the credential |
-| POST | `authenticate/begin/` | Returns `publicKeyCredentialRequestOptions`. `username` body field optional (passwordless flows often omit it) |
-| POST | `authenticate/complete/` | Verifies assertion via `verify_authentication_response`, runs `is_replay`, then either marks `session.mfa_pending=false` (MFA path) or calls Django `login()` (passwordless path) |
+| Method | Path                     | Purpose                                                                                                                                                                           |
+| ------ | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `credentials/`           | List the calling user's credentials                                                                                                                                               |
+| PATCH  | `credentials/{id}/`      | Rename (`{label}`)                                                                                                                                                                |
+| DELETE | `credentials/{id}/`      | Delete                                                                                                                                                                            |
+| POST   | `register/begin/`        | Returns `publicKeyCredentialCreationOptions` JSON; stores a fresh challenge                                                                                                       |
+| POST   | `register/complete/`     | Verifies attestation with `webauthn.verify_registration_response`, persists the credential                                                                                        |
+| POST   | `authenticate/begin/`    | Returns `publicKeyCredentialRequestOptions`. `username` body field optional (passwordless flows often omit it)                                                                    |
+| POST   | `authenticate/complete/` | Verifies assertion via `verify_authentication_response`, runs `is_replay`, then either marks `session.mfa_pending=false` (MFA path) or calls Django `login()` (passwordless path) |
 
 Origin and Relying-Party ID are derived from the request:
+
 - `_origin(request)` = `request.build_absolute_uri('/').rstrip('/')`
 - `_rp_id(request)` = `request.get_host().split(':')[0]`
 

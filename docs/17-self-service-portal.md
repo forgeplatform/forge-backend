@@ -60,19 +60,19 @@ Node Surveys feature).
 
 ### `ServiceCatalogItem(CommonModelNameNotUnique)`
 
-| Field | Notes |
-|---|---|
-| `organization` | FK Organization (scopes visibility) |
-| `name` | unique per org |
-| `description` | free text |
-| `icon` | lucide icon name shown in portal cards |
-| `category` | indexed; used for grouping/filtering |
-| `tags` | JSON list, free-form |
-| `job_template` | FK; **exactly one** of jt/wfjt set (validated in `clean()`) |
-| `workflow_job_template` | FK; the other side |
-| `requires_approval` | bool |
-| `approver_team` | FK Team; null = falls back to org admins |
-| `enabled` | bool; disabled items are hidden from portal |
+| Field                   | Notes                                                       |
+| ----------------------- | ----------------------------------------------------------- |
+| `organization`          | FK Organization (scopes visibility)                         |
+| `name`                  | unique per org                                              |
+| `description`           | free text                                                   |
+| `icon`                  | lucide icon name shown in portal cards                      |
+| `category`              | indexed; used for grouping/filtering                        |
+| `tags`                  | JSON list, free-form                                        |
+| `job_template`          | FK; **exactly one** of jt/wfjt set (validated in `clean()`) |
+| `workflow_job_template` | FK; the other side                                          |
+| `requires_approval`     | bool                                                        |
+| `approver_team`         | FK Team; null = falls back to org admins                    |
+| `enabled`               | bool; disabled items are hidden from portal                 |
 
 Helper props: `underlying_template`, `is_workflow`.
 
@@ -130,27 +130,27 @@ Mounted under `/api/v2/service_catalog_items/` and `/api/v2/service_requests/`.
 
 ### Catalog items
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/api/v2/service_catalog_items/` | list (filters: `category`, `enabled`, `organization`, `search`) |
-| POST | `/api/v2/service_catalog_items/` | create |
-| GET | `/api/v2/service_catalog_items/{id}/` | detail |
-| PATCH | `/api/v2/service_catalog_items/{id}/` | update |
-| DELETE | `/api/v2/service_catalog_items/{id}/` | delete |
-| GET | `/api/v2/service_catalog_items/{id}/launch_data/` | merged survey spec from underlying JT/WFJT, plus per-node surveys for workflows |
-| GET | `/api/v2/service_catalog_items/{id}/requests/` | requests for this item (admin) |
-| POST | `/api/v2/service_catalog_items/{id}/submit/` | end-user submission entry point |
+| Method | Path                                              | Purpose                                                                         |
+| ------ | ------------------------------------------------- | ------------------------------------------------------------------------------- |
+| GET    | `/api/v2/service_catalog_items/`                  | list (filters: `category`, `enabled`, `organization`, `search`)                 |
+| POST   | `/api/v2/service_catalog_items/`                  | create                                                                          |
+| GET    | `/api/v2/service_catalog_items/{id}/`             | detail                                                                          |
+| PATCH  | `/api/v2/service_catalog_items/{id}/`             | update                                                                          |
+| DELETE | `/api/v2/service_catalog_items/{id}/`             | delete                                                                          |
+| GET    | `/api/v2/service_catalog_items/{id}/launch_data/` | merged survey spec from underlying JT/WFJT, plus per-node surveys for workflows |
+| GET    | `/api/v2/service_catalog_items/{id}/requests/`    | requests for this item (admin)                                                  |
+| POST   | `/api/v2/service_catalog_items/{id}/submit/`      | end-user submission entry point                                                 |
 
 ### Service requests
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/api/v2/service_requests/` | list (filters: `mine`, `status`, `catalog_item`) |
-| GET | `/api/v2/service_requests/pending_approvals/` | approval inbox (filtered to caller's authority) |
-| GET | `/api/v2/service_requests/{id}/` | detail |
-| DELETE | `/api/v2/service_requests/{id}/` | only allowed in `pending_approval` / `rejected` state |
-| POST | `/api/v2/service_requests/{id}/approve/` | approve + launch |
-| POST | `/api/v2/service_requests/{id}/reject/` | reject (`{reason}`) |
+| Method | Path                                          | Purpose                                               |
+| ------ | --------------------------------------------- | ----------------------------------------------------- |
+| GET    | `/api/v2/service_requests/`                   | list (filters: `mine`, `status`, `catalog_item`)      |
+| GET    | `/api/v2/service_requests/pending_approvals/` | approval inbox (filtered to caller's authority)       |
+| GET    | `/api/v2/service_requests/{id}/`              | detail                                                |
+| DELETE | `/api/v2/service_requests/{id}/`              | only allowed in `pending_approval` / `rejected` state |
+| POST   | `/api/v2/service_requests/{id}/approve/`      | approve + launch                                      |
+| POST   | `/api/v2/service_requests/{id}/reject/`       | reject (`{reason}`)                                   |
 
 ### Submit payload
 

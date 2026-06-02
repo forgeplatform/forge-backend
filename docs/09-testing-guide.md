@@ -6,14 +6,14 @@ How to run tests, what to test, and where tests live.
 
 ## Test Suite Overview
 
-| Suite | Tool | Count | Location |
-|-------|------|-------|----------|
-| Python unit | pytest | 1083 | `forge/main/tests/unit/` |
-| Python functional (API) | pytest | 989 | `forge/main/tests/functional/` |
-| Standalone (EDA, drift, service catalog, webauthn, policy, scanner, audit) | unittest | 154+ | `tests_standalone/` |
-| Frontend | vitest | 72+ | `forge/ui_next/src/**/*.test.{ts,tsx}` |
-| Python lint | flake8 | — | `forge/` |
-| Frontend lint | TypeScript | — | `forge/ui_next/src/` |
+| Suite                                                                      | Tool       | Count | Location                               |
+| -------------------------------------------------------------------------- | ---------- | ----- | -------------------------------------- |
+| Python unit                                                                | pytest     | 1083  | `forge/main/tests/unit/`               |
+| Python functional (API)                                                    | pytest     | 989   | `forge/main/tests/functional/`         |
+| Standalone (EDA, drift, service catalog, webauthn, policy, scanner, audit) | unittest   | 154+  | `tests_standalone/`                    |
+| Frontend                                                                   | vitest     | 72+   | `forge/ui_next/src/**/*.test.{ts,tsx}` |
+| Python lint                                                                | flake8     | —     | `forge/`                               |
+| Frontend lint                                                              | TypeScript | —     | `forge/ui_next/src/`                   |
 
 ### Standalone Tests (no Django required)
 
@@ -74,15 +74,15 @@ docker run --rm \
 
 ### Useful pytest flags
 
-| Flag | What it does |
-|------|-------------|
-| `-q` | Quiet output (just pass/fail counts) |
-| `-v` | Verbose (show each test name) |
-| `-x` | Stop on first failure |
-| `-k "pattern"` | Run only tests matching a pattern |
-| `--lf` | Run only tests that failed last time |
-| `--tb=short` | Short tracebacks |
-| `-s` | Show print() output |
+| Flag           | What it does                         |
+| -------------- | ------------------------------------ |
+| `-q`           | Quiet output (just pass/fail counts) |
+| `-v`           | Verbose (show each test name)        |
+| `-x`           | Stop on first failure                |
+| `-k "pattern"` | Run only tests matching a pattern    |
+| `--lf`         | Run only tests that failed last time |
+| `--tb=short`   | Short tracebacks                     |
+| `-s`           | Show print() output                  |
 
 ### Examples
 
