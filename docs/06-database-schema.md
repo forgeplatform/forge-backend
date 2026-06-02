@@ -190,7 +190,7 @@ gunzip -c backup_20260310.sql.gz | docker compose exec -T postgres psql -U forge
 
 # Restart
 docker compose start forge-web forge-task
-docker compose exec forge-web awx-manage migrate  # if version differs
+docker compose exec forge-web forge-manage migrate  # if version differs
 ```
 
 ### Cleanup (MANDATORY in production)
@@ -278,7 +278,7 @@ WHERE h.has_active_failures = true;
 docker compose exec postgres psql -U forge forge
 
 # Or through Django
-docker compose exec forge-web awx-manage dbshell
+docker compose exec forge-web forge-manage dbshell
 ```
 
 ---

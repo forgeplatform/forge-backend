@@ -182,7 +182,7 @@ docker compose exec redis redis-cli -n 0 LLEN celery
 
 ```bash
 # Check node capacity
-docker compose exec forge-web awx-manage list_instances
+docker compose exec forge-web forge-manage list_instances
 # If remaining = 0, there's no free capacity
 ```
 

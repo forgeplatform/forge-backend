@@ -449,13 +449,13 @@ export function useAssistant() {
 
 ```bash
 # Index all documents
-awx-manage index_docs
+forge-manage index_docs
 
 # Re-index after an update
-awx-manage index_docs --rebuild
+forge-manage index_docs --rebuild
 
 # Test RAG search
-awx-manage query_docs "how to create inventory"
+forge-manage query_docs "how to create inventory"
 ```
 
 ### 4.2 Auto-generating API Documentation
