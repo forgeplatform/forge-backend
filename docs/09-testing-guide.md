@@ -59,17 +59,17 @@ python -m unittest discover tests_standalone -v
 
 ```bash
 vagrant ssh
-cd /awx_devel
+cd /forge_devel
 
 # All unit tests
 docker run --rm \
-  -v /awx_devel:/awx_devel \
+  -v /forge_devel:/forge_devel \
   -e DJANGO_SETTINGS_MODULE=forge.settings.defaults \
   --network docker-compose-prod_forge \
   --user 0 \
   forge-platform/forge:latest \
   bash -c "pip install pytest pytest-django pytest-mock drf-yasg -q && \
-    cd /awx_devel && python -m pytest forge/main/tests/unit/ -q"
+    cd /forge_devel && python -m pytest forge/main/tests/unit/ -q"
 ```
 
 ### Useful pytest flags
